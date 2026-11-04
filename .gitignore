@@ -1,0 +1,17 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data and large artifacts (runs/ is intentionally NOT ignored: emissions.csv files are committed)
+data/
+*.zip
+*.npz
+*.pt
+*.pth
+
+# CodeCarbon local config
+.codecarbon.config
