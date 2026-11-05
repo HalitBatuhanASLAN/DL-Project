@@ -1,0 +1,40 @@
+{
+  "args": {
+    "rules_version": "rules-v2",
+    "model": "mobilenet_v3_small",
+    "seed": 42,
+    "lr": 0.001,
+    "resolution": "128x96",
+    "max_steps": 20,
+    "amp": false,
+    "eval_every": 10
+  },
+  "seed": 42,
+  "command": [
+    "scripts/train.py",
+    "--model",
+    "mobilenet_v3_small",
+    "--seed",
+    "42",
+    "--lr",
+    "1e-3",
+    "--resolution",
+    "128x96",
+    "--max-steps",
+    "20",
+    "--eval-every",
+    "10",
+    "--category",
+    "env",
+    "--notes",
+    "smoke test"
+  ],
+  "git_commit": "f07c478fac4eb4df289fb28a105b512200f965f1",
+  "rules_sha256": "54a49b7475bc69ca4afbb8567a47526e85b5902c361bfdb94d7ecb16f32f0437",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}
