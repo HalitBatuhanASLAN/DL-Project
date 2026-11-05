@@ -1,5 +1,5 @@
 CSE655 TERM PROJECT - REPORT NOTES (running log)
-Last update: 2026-11-04
+Last update: 2026-11-05
 
 1. DATASET SELECTION
 - Candidates reviewed: UTKFace, APPA-REAL, RSNA Bone Age, PetFinder Pawpularity,
@@ -23,6 +23,14 @@ Last update: 2026-11-04
 - To justify later: subset choice (blur levels), image size (64 vs 128), discrete count values.
 - Data leakage risk: the same simulated scene exists at several blur levels and two stains.
   Split must be GROUPED (same cell count + sample id -> same split). Verify on file names in Stage 1.
+  Literature support (paper I presented in the DL course): Zhao, Hong, Wang, "Abnormal gait
+  recognition with millimetre-wave radar based on perceptual loss and ..." IET Radar Sonar Navig.
+  2024 (doi 10.1049/rsn2.12664), Sec. 4.2.1: 2,400 samples from 60 participants; train/test split
+  "mutually exclusive" so all samples of a subject are in one set; sex ratio kept in both sets;
+  12 test subjects (480 samples); fixed seed and identical settings for all compared networks.
+  Analogy: subject -> scene (count, sample); sex-ratio balance -> balance per cell count.
+  Provenance (be honest in AI report): leakage was first raised by AI (separate Claude chat and
+  ChatGPT, 2026-11-04); I recognised it from this paper and used the paper to verify/justify it.
 - VERIFIED 2026-11-05 (scripts/data_inventory.py, results/data_inventory.txt):
   19,200 TIF = 600 scenes (24 counts x 25 samples) x 16 blur levels x 2 stains, fully balanced.
   Counts: 1,5,10,...,100 (24 values). Blur: F1..F48 (16 values). Images 8-bit grey 696x520.
@@ -31,6 +39,57 @@ Last update: 2026-11-04
   -> only 600 independent scenes; "19,200 images" overstates diversity; report both numbers.
   Limitation: synthetic data, no claim about real microscopy images.
 - License wording: quote the official page sentence (CC0 waiver by Anne Carpenter); re-check page.
+  Also cite SIMCEP (Lehmussola et al., IEEE TMI 2007) and Ljosa et al. 2012.
+- Baseline (analytic, balanced counts): mean = 1212/24 = 50.5, MAE_mean = 620/24 = 25.8 cells
+  (median gives the same MAE). -> 0.6x rule ~ 15.5 cells (easy). Binding rule: 1.15x MAE_best.
+- Extra sanity baseline to add: linear regression on mean pixel intensity (brightness shortcut).
+- Limitation to state: test counts are the same 24 levels as training unless some levels are
+  held out; claims limited to "unseen scenes at seen count levels".
+- Report test MAE with bootstrap CIs over scenes (120 test scenes), not images.
+- Decided (2026-11-05, pending final confirmation): split by sample index (seeded shuffle of
+  s01-s25, 15/5/5 per count) = scene-grouped and perfectly balanced; target scaled count/100;
+  flips only (no crop/zoom/cutout, no 90 deg rotation); cache once; train-set mean/std;
+  no snapping to known count levels; ablations on validation; separate test-only script.
+- DECISIONS 2026-11-05 21:43 (my choices after the AI discussion):
+  1A Hold out 4 interior counts (14, 40, 66, 91) from train/val. Why: test whether the model
+     really regresses instead of recognising 24 levels. Acceptance uses seen-count test MAE;
+     unseen-count MAE is a diagnostic only. MAE_mean recomputed on 20 counts (mean 50.05).
+     Scenes: train 300 (15 samples x 20 counts), val 100, test-seen 100, test-unseen 100 (25 x 4).
+  2A Light visual check (no training, CPU): stain overlay, file sanity, nucleus size/spacing,
+     resolution sheet (native / 256x192 / 128x96), blur-similarity curve. Why: evidence-based
+     choices at minimal energy; easy to explain.
+  3A Resolution by a pre-registered rule (128x96 unless nuclei are too small / merge; otherwise
+     256x192); the other one becomes the ablation. Why: resolution drives energy per step; must
+     not be chosen by whether the acceptance rule passes.
+  4A Blur levels by a pre-registered rule: always F1 and F48, intermediate levels where the image
+     changes by equal amounts (expected 4-6 levels). Why: cover the full blur range without
+     near-duplicate levels.
+  Stain: nuclei channel (official page: w2 = nuclei), confirmed by the overlay check.
+- Open until the visual check: exact resolution, exact blur levels, stain confirmation.
+
+2c. PRE-REGISTERED DECISION RULES (agreed 2026-11-05, frozen in repo before running)
+- Stain: on C1 F1, first 2 training samples, Otsu + largest object; channel X = nuclei if in both
+  images containment(X in Y) >= 0.90 and area(X)/area(Y) <= 0.70. Otherwise stop, check 5 samples.
+- Resolution (nuclei channel, F1): (1) median nucleus equivalent diameter >= 3.0 px at the
+  candidate size (native / 5.44 for 128x96, / 2.72 for 256x192), C1 F1, 5 training samples;
+  (2) on C100 F1 (5 samples) >= 90% of nearest-neighbour pairs resolved at native stay resolved
+  (min on the line between centres <= 0.80 x lower peak, ~Rayleigh). Try 128x96 first, then
+  256x192, then 348x260. Area-averaging resize; 128x96 changes aspect ratio by 0.4% (negligible).
+- Blur levels: D(F) = 1 - mean high-pass correlation with F1 (image minus Gaussian, sigma = nucleus
+  radius) over 20 training scenes; K = ceil(D(F48)/0.20)+1 clipped to [4,6]; F1 and F48 always;
+  intermediate levels at equal steps of D. Raw Pearson not used (r(F1,F48) = 0.89 already).
+  0.20 is a stated convention.
+- Seen-count baseline: mean 50.05, MAE_mean = 25.85, 0.6x = 15.51.
+- Acceptance decided on point estimates; report paired bootstrap CI of MAE_own/MAE_best over scenes.
+- Brightness baseline feature fixed in advance: raw mean of the cached resized image (no
+  background subtraction); OLS on train; reported on val, test once.
+- Steps and freezes: rules (tag rules-v1) -> split (split-v1) -> stain/sanity -> resolution ->
+  blur (data-v1) -> cache + train mean/std (cache-v1) -> baselines. Scripts refuse to run without
+  the previous decision; only evaluate_test.py reads test arrays.
+- Limitations to state: resolution evidence is geometric only (no classical-count test; the
+  resolution ablation is the empirical check); validation has no unseen counts; file-sanity check
+  reads test files for aggregate statistics only (no viewing); data_inventory.py first run untracked
+  (re-run once under the helper).
 
 2. COMPUTE / HARDWARE
 - Initial plan: write code locally (VS Code), run all reported experiments on Google Colab (T4).
@@ -47,6 +106,21 @@ Last update: 2026-11-04
   (implied grid intensity ~465 g CO2eq/kWh). GPU measured via NVML, CPU via Windows EMI,
   RAM estimated -> mention in limitations.
 - 4 GB VRAM limits batch size / resolution -> supports small-model + mixed-precision choices.
+
+2b. CARBON ACCOUNTING POLICY (decided 2026-11-05)
+- Spec 3.4: "Measure every training and evaluation run, including hyperparameter searches and
+  failed runs." Report per model: final training run AND whole project (sum of all runs).
+- We track MORE than training: every script that does compute is wrapped in CodeCarbon
+  (country_iso_code="TUR"): env check, preprocessing/caching, baselines, LR searches,
+  training (also failed/aborted), evaluation, latency/FLOP measurement.
+- Each run: runs/<run_id>/ with emissions.csv + config.json + metrics.json;
+  tags: model, category (env/preprocess/baseline/search/train/eval/measure), status (ok/failed).
+  Tracker stops in a finally-block so crashed runs are still logged.
+- Table columns: "Train kWh/CO2" = final training run; "Project CO2" = all runs of that model.
+  Shared runs (env check, preprocessing, baseline) reported separately as shared overhead.
+- Caching is a listed efficiency technique -> measure it to report what it saved.
+- Not measured (state as limitation): AI assistant usage, dataset download, idle dev time,
+  ImageNet pre-training (discuss qualitatively as historical footprint).
 
 3. PROTOCOL RULES (adopted from day 1)
 - Every training/evaluation run tracked with CodeCarbon, failed runs included.
@@ -67,3 +141,13 @@ Last update: 2026-11-04
   installed CUDA 12.4 build, wrote scripts/check_env.py (CodeCarbon smoke test),
   .gitignore, requirements.txt, README setup. Verified: CUDA available, git status
   excluded .venv/ and data/. Kept as is.
+
+5. PROGRESS LOG
+- 2026-11-05: rules-v1 tagged (docs/decision_rules.md, configs/rules.json).
+- 2026-11-05: split-v1 tagged. Seed 42 permutation of samples 1..25:
+  train 16 17 20 21 10 8 18 25 7 11 4 1 22 19 13 | val 6 12 15 24 3 | test 5 23 2 14 9.
+  Held-out counts 14, 40, 66, 91 -> test_unseen (all 25 samples). Scenes 300/100/100/100.
+  All split checks PASS. splits.csv SHA-256 43fee578...3690.
+- Tracked runs so far: legacy env check 0.000188 kWh; inventory re-run 0.000353 kWh (34 s);
+  split 0.0000036 kWh (0.4 s, short run). Plus one untracked-then-logged synthetic helper test.
+- Next: visual checks (stain, resolution, blur) -> data-v1; then cache + baselines -> cache-v1.

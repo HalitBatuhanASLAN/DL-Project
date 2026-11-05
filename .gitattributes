@@ -1,0 +1,12 @@
+# Store these byte for byte: git's CRLF conversion would change the bytes, and so the
+# SHA-256 recorded in every run's config.json (core.autocrlf is true on this machine).
+# splits/.gitattributes stays in force; it also protects splits.sha256.
+configs/*.json -text
+configs/*.csv  -text
+configs/*.md   -text
+docs/*.json    -text
+docs/*.csv     -text
+docs/*.md      -text
+splits/*.json  -text
+splits/*.csv   -text
+splits/*.md    -text
