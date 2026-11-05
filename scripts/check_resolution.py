@@ -133,9 +133,12 @@ def run_pair_check(table, stain, pair_rules, candidates, d_native):
     window = odd_window(d_native)
     limit = pair_rules["max_saddle_to_peak"]
     n_points = pair_rules["line_points"]
-    sigma = pair_rules["peak_smoothing_sigma_px"]
+    # rules-v1.1: peaks and pairs are measured at nucleus scale.
+    sigma = d_native / 4
+    min_distance = d_native / 2
     rows = []
     peaks_per_image = {}
+    pairs_before_filter = 0
     figure_data = None
 
     for sample in samples:
@@ -144,16 +147,20 @@ def run_pair_check(table, stain, pair_rules, candidates, d_native):
         peaks = find_peaks(native, window, sigma)
         pairs = nearest_neighbour_pairs(peaks)
         peaks_per_image[str(sample)] = len(peaks)
+        pairs_before_filter += len(pairs)
 
         pair_rows = []
         for i, j in pairs:
+            distance = float(np.hypot(*(peaks[i] - peaks[j])))
+            if distance < min_distance:
+                continue  # Too close to be two nuclei: not a candidate pair.
             row = {
                 "sample": sample,
                 "r1": int(peaks[i][0]),
                 "c1": int(peaks[i][1]),
                 "r2": int(peaks[j][0]),
                 "c2": int(peaks[j][1]),
-                "distance_px": float(np.hypot(*(peaks[i] - peaks[j]))),
+                "distance_px": distance,
                 "ratio_native": dip_ratio(native, peaks[i], peaks[j], 1.0, 1.0, n_points),
             }
             for name, (image, size_wh) in resized.items():
@@ -182,8 +189,11 @@ def run_pair_check(table, stain, pair_rules, candidates, d_native):
 
     numbers = {
         "samples": samples,
+        "peak_smoothing_sigma_px": sigma,
         "maximum_filter_window_px": window,
+        "min_pair_distance_px": min_distance,
         "peaks_per_image": peaks_per_image,
+        "pairs_before_distance_filter": pairs_before_filter,
         "pairs": len(df),
         "resolved_at_native": len(native_resolved),
         "pair_distance_px_min_median_max": [
@@ -271,7 +281,7 @@ def draw_peaks(figure_data, main_name, limit):
     plt.close(fig)
 
 
-def choose(res_rules, passes_128, passes_256):
+def choose(passes_128, passes_256):
     """Decision rule of section 4. Returns the main resolution name."""
     if passes_128:
         return "128x96"
@@ -302,12 +312,13 @@ def main():
     )
     pairs.to_csv(PAIRS_CSV, index=False, lineterminator="\n")
     print(f"Check 2: {pair_numbers}")
+    print(f"Peaks per C100 image (100 nuclei): {pair_numbers['peaks_per_image']}")
 
     passes = {
         name: size_numbers["candidates"][name]["passes"] and pair_numbers["candidates"][name]["passes"]
         for name in size_numbers["candidates"]
     }
-    main_name = choose(res_rules, passes["128x96"], passes["256x192"])
+    main_name = choose(passes["128x96"], passes["256x192"])
     ablation_name = res_rules["ablation_for"][main_name]
     main_wh = [int(value) for value in main_name.split("x")]
 
