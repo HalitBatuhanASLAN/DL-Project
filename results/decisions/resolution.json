@@ -1,0 +1,105 @@
+{
+  "rules_version": "rules-v1.1",
+  "nuclei_stain": 1,
+  "d_native_px": 31.735350634355903,
+  "check_1_size": {
+    "samples": [
+      1,
+      4,
+      7,
+      8,
+      10
+    ],
+    "areas_px": [
+      742,
+      791,
+      852,
+      791,
+      791
+    ],
+    "diameters_px": [
+      30.736683981742253,
+      31.735350634355903,
+      32.9363035587535,
+      31.735350634355903,
+      31.735350634355903
+    ],
+    "d_native_median_px": 31.735350634355903,
+    "limit_px": 3.0,
+    "candidates": {
+      "128x96": {
+        "factor": 5.4375,
+        "d_at_candidate_px": 5.836386323559706,
+        "passes": true
+      },
+      "256x192": {
+        "factor": 2.71875,
+        "d_at_candidate_px": 11.672772647119412,
+        "passes": true
+      },
+      "348x260": {
+        "factor": 2.0,
+        "d_at_candidate_px": 15.867675317177952,
+        "passes": true
+      }
+    }
+  },
+  "check_2_separation": {
+    "samples": [
+      1,
+      4,
+      7,
+      8,
+      10
+    ],
+    "peak_smoothing_sigma_px": 7.933837658588976,
+    "maximum_filter_window_px": 15,
+    "min_pair_distance_px": 15.867675317177952,
+    "peaks_per_image": {
+      "1": 93,
+      "4": 86,
+      "7": 87,
+      "8": 88,
+      "10": 93
+    },
+    "pairs_before_distance_filter": 320,
+    "pairs": 320,
+    "resolved_at_native": 304,
+    "pair_distance_px_min_median_max": [
+      19.026297590440446,
+      43.60045871318328,
+      95.13148795220224
+    ],
+    "max_saddle_to_peak": 0.8,
+    "min_resolved_retention": 0.9,
+    "candidates": {
+      "128x96": {
+        "kept": 302,
+        "retention": 0.993421052631579,
+        "passes": true
+      },
+      "256x192": {
+        "kept": 304,
+        "retention": 1.0,
+        "passes": true
+      },
+      "348x260": {
+        "kept": 304,
+        "retention": 1.0,
+        "passes": true
+      }
+    }
+  },
+  "candidate_passes_both": {
+    "128x96": true,
+    "256x192": true,
+    "348x260": true
+  },
+  "main_resolution": "128x96",
+  "main_resolution_wh": [
+    128,
+    96
+  ],
+  "main_factor": 5.4375,
+  "ablation_resolution": "256x192"
+}

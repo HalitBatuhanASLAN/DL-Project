@@ -64,7 +64,8 @@ Last update: 2026-11-05
   4A Blur levels by a pre-registered rule: always F1 and F48, intermediate levels where the image
      changes by equal amounts (expected 4-6 levels). Why: cover the full blur range without
      near-duplicate levels.
-  Stain: nuclei channel (official page: w2 = nuclei), confirmed by the overlay check.
+  Stain: nuclei channel. Official page says w2 = nuclei, BUT our check A (2026-11-05) shows
+  w1 = nuclei (w1 blob fully inside the larger w2 body). Report this documentation conflict.
 - Open until the visual check: exact resolution, exact blur levels, stain confirmation.
 
 2c. PRE-REGISTERED DECISION RULES (agreed 2026-11-05, frozen in repo before running)
@@ -151,3 +152,9 @@ Last update: 2026-11-05
 - Tracked runs so far: legacy env check 0.000188 kWh; inventory re-run 0.000353 kWh (34 s);
   split 0.0000036 kWh (0.4 s, short run). Plus one untracked-then-logged synthetic helper test.
 - Next: visual checks (stain, resolution, blur) -> data-v1; then cache + baselines -> cache-v1.
+- 2026-11-05 data-v1 (rules-v1 results): nuclei = w1 (conflict with docs); d_native 31.7 px;
+  check 2 failed all candidates because the peak detector worked at sub-nucleus scale (texture),
+  fallback 348x260; K = 4 (F1, F23, F39, F48), D(F48) = 0.20 far below the expected 0.6-1.0.
+  Visual checks energy: 0.00184 kWh; project total so far 0.00238 kWh (7 runs).
+- Limitations to state: check-2 flaw and its correction (if revised, report BOTH v1 and v2
+  outcomes); blur metric range smaller than expected -> K came from the spec-driven minimum.

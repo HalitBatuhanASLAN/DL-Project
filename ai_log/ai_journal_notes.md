@@ -341,6 +341,33 @@ Rules: real dates only, no backfilling, never invent AI errors.
      journal was not committed -> restore and commit both.
 - Accepted: all code, split, tags; .gitattributes idea.
 
+## Entry K — 2026-11-05 ~22:40 — Housekeeping + visual checks (Claude Desktop, code mode)
+- Logs: ai_log/prompts|sessions/2026-11-05_03_housekeeping_visual_checks.md; tag data-v1 (c0995a1).
+- Results with the frozen rules-v1:
+  - Check F: all 19,200 files 520x696 uint8; no saturation. w1 mean ~17, w2 mean ~53.
+  - Check A: w1 PASSES (containment 1.00, area ratio 0.25-0.31), w2 FAILS -> nuclei = w1,
+    CONFLICTING with the official BBBC005 page and the SSC case study (both say w2 = nuclei).
+    Agent checked the overlay before continuing: small w1 blob inside the larger w2 body.
+  - Check 1: d_native = 31.7 px -> 5.8 / 11.7 / 15.9 px at 128x96 / 256x192 / 348x260, all pass.
+  - Check 2: all candidates FAIL (retention 0.63 / 0.86 / 0.8997) -> fallback 348x260.
+    Agent diagnosis: the peak finder found 154-185 peaks per 100-nuclei image; 80% of "pairs" are
+    closer than one nucleus diameter -> the check measured TEXTURE INSIDE nuclei, not separation
+    between nuclei. For pairs >= d_native apart, retention is 0.954 / 0.991 / 1.000.
+  - B1: D(F48) = 0.203 (expected 0.6-1.0) -> K from the lower clip = 4: F1, F23, F39, F48.
+- Agent behaviour: applied the frozen rule unchanged, did not "fix" it silently, flagged the flaw
+  and the 9.8x pixel cost, and asked whether to keep 348x260 or draft a new rule version.
+- My review (project chat):
+  - Stain conflict is a key finding: documentation vs. pixels. The very first AI guess
+    (Entry I: w1 = nuclei from brightness) was right for the wrong reason; its later
+    "correction" (I-2) followed the documentation, which our data contradicts. Our own
+    pre-registered pixel test decided. Report the conflict honestly.
+  - Check 2 design flaw: the peak detector's smoothing (sigma 1 px) and window (15 px) are far
+    below nucleus scale (d = 31.7 px). This is a measurement error in the rule, found by
+    diagnostics, before any model was trained.
+  - Synthetic test row was written with status "ok" but that run was the deliberate failure
+    test -> must be "failed" (my prompt error; agent flagged it).
+- Decision: see Entry K-2.
+
 ---
 ## Candidate "AI was wrong" cases for the report (real, verified)
 1. Gemini: MAE 6-7 "passes" the 1.15x rule — contradicted by its own later arithmetic.
@@ -355,8 +382,10 @@ Rules: real dates only, no backfilling, never invent AI errors.
 8. ChatGPT: first answer never considered BBBC005; listed Pawpularity.
 9. Claude Desktop: transcript search read unrelated projects' data (privacy risk on a public
    repo); caught by its own scan before commit.
-10. Claude Desktop chat (Entry I): overconfident stain identity from 5 images (official page says
-    the opposite; AI admitted in I-2); wrong claim about CPU energy estimation; energy-heavy
+10. Claude Desktop chat (Entry I/I-2): stain identity. Entry I guessed w1 = nuclei from mean
+    brightness of 5 images (bad method). I-2 "corrected" it to w2 following the official page.
+    Our pixel check (Entry K) shows w1 = nuclei. Lesson: neither a weak heuristic nor
+    documentation replaced a direct measurement. Also: wrong CPU-energy claim; energy-heavy
     recommendation without evidence.
 11. Claude Desktop chat (Entry I-2): split arithmetic error (480 instead of 400 seen-count test images).
 12. Claude Desktop chat (I-2 -> I-3): raw-Pearson blur rule could not work (self-corrected);
@@ -365,6 +394,9 @@ Rules: real dates only, no backfilling, never invent AI errors.
     without PyYAML installed; wrong script name (caught by me).
 14. Claude Desktop code (Entry J): ran an energy-consuming test run without logging it to
     runs/index.csv; recorded a git commit that does not contain the code that ran.
+15. Rule design (Desktop chat, I-3, accepted by me): check 2 peak detector at the wrong scale
+    (sigma 1 px, window 15 px vs nucleus 31.7 px) -> measured texture, not nucleus separation.
+    Caught by the code agent's own diagnostic plot. Shared responsibility: I approved the rule.
 Cross-model observation: with the same first prompt, Gemini, ChatGPT and the separate Claude chat
 all ranked UTKFace first; only the project chat ranked BBBC005 first. All three later switched to
 BBBC005 after seeing that analysis. Two (Claude separate, ChatGPT) independently raised the
