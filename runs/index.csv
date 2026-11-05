@@ -10,3 +10,5 @@ synthetic_helper_test_20261105,2026-11-05,env,none,failed,0.15,1.7e-08,,True,"sy
 20261105-224905_analysis_none_17c5,2026-11-05T22:49:05,analysis,none,ok,1.055257499916479,9.701061406692877e-06,4.506977314689817e-06,True,
 20261105-225640_preprocess_none_851d,2026-11-05T22:56:40,preprocess,none,ok,13.884710100013763,0.00013108803389399537,6.090166531467573e-05,True,
 20261105-225713_baseline_mean_and_brightness_6ea7,2026-11-05T22:57:13,baseline,mean_and_brightness,ok,10.635259100003168,0.0001072060193902903,4.9806415724457406e-05,True,
+untracked_metrics_selftest_20261105,2026-11-05T22:56:30,analysis,none,ok,1.15,,,True,"untracked, not measured; src.metrics self-test, synthetic numbers, start time approximate"
+untracked_size_check_20261105,2026-11-05T23:08:30,measure,none,ok,2,,,True,"untracked, not measured; size check of candidate models on CPU, no data, duration is an estimate"
