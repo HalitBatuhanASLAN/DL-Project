@@ -137,5 +137,6 @@ None. No run failed and no script needed a second attempt.
 ## Left open
 
 - `ai_log/report_notes.txt` and `ai_log/ai_journal_notes.md` do not yet record this result.
-- Findings 2 and 5 need a decision before training.
+- Finding 2, decided after review: the acceptance rule stays as it is. Brightness is not added.
+- Finding 5 needs a line in the next rule version.
 - No model code was written and no training was run, as instructed.
