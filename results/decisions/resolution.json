@@ -1,0 +1,102 @@
+{
+  "rules_version": "rules-v1",
+  "nuclei_stain": 1,
+  "d_native_px": 31.735350634355903,
+  "check_1_size": {
+    "samples": [
+      1,
+      4,
+      7,
+      8,
+      10
+    ],
+    "areas_px": [
+      742,
+      791,
+      852,
+      791,
+      791
+    ],
+    "diameters_px": [
+      30.736683981742253,
+      31.735350634355903,
+      32.9363035587535,
+      31.735350634355903,
+      31.735350634355903
+    ],
+    "d_native_median_px": 31.735350634355903,
+    "limit_px": 3.0,
+    "candidates": {
+      "128x96": {
+        "factor": 5.4375,
+        "d_at_candidate_px": 5.836386323559706,
+        "passes": true
+      },
+      "256x192": {
+        "factor": 2.71875,
+        "d_at_candidate_px": 11.672772647119412,
+        "passes": true
+      },
+      "348x260": {
+        "factor": 2.0,
+        "d_at_candidate_px": 15.867675317177952,
+        "passes": true
+      }
+    }
+  },
+  "check_2_separation": {
+    "samples": [
+      1,
+      4,
+      7,
+      8,
+      10
+    ],
+    "maximum_filter_window_px": 15,
+    "peaks_per_image": {
+      "1": 164,
+      "4": 154,
+      "7": 157,
+      "8": 160,
+      "10": 185
+    },
+    "pairs": 540,
+    "resolved_at_native": 299,
+    "pair_distance_px_min_median_max": [
+      8.246211251235321,
+      20.84463253225296,
+      88.95504482602435
+    ],
+    "max_saddle_to_peak": 0.8,
+    "min_resolved_retention": 0.9,
+    "candidates": {
+      "128x96": {
+        "kept": 188,
+        "retention": 0.6287625418060201,
+        "passes": false
+      },
+      "256x192": {
+        "kept": 258,
+        "retention": 0.862876254180602,
+        "passes": false
+      },
+      "348x260": {
+        "kept": 269,
+        "retention": 0.8996655518394648,
+        "passes": false
+      }
+    }
+  },
+  "candidate_passes_both": {
+    "128x96": false,
+    "256x192": false,
+    "348x260": false
+  },
+  "main_resolution": "348x260",
+  "main_resolution_wh": [
+    348,
+    260
+  ],
+  "main_factor": 2.0,
+  "ablation_resolution": "256x192"
+}

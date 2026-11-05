@@ -1,0 +1,140 @@
+{
+  "rules_version": "rules-v1",
+  "check_f": {
+    "files_checked": 19200,
+    "bad_files": [],
+    "by_stain_and_split": [
+      {
+        "stain": 1,
+        "split": "train",
+        "files": 4800,
+        "min": 0,
+        "max": 255,
+        "mean": 16.937562433226496,
+        "mean_of_medians": 2.419583333333333,
+        "pct_pixels_at_0": 4.596600768125553,
+        "pct_pixels_at_255": 5.7563365753020924e-08
+      },
+      {
+        "stain": 1,
+        "split": "val",
+        "files": 1600,
+        "min": 0,
+        "max": 251,
+        "mean": 16.85069848827089,
+        "mean_of_medians": 2.414375,
+        "pct_pixels_at_0": 4.594102978558798,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 1,
+        "split": "test_seen",
+        "files": 1600,
+        "min": 0,
+        "max": 254,
+        "mean": 16.97123689800232,
+        "mean_of_medians": 2.4525,
+        "pct_pixels_at_0": 4.576538841456675,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 1,
+        "split": "test_unseen",
+        "files": 1600,
+        "min": 0,
+        "max": 253,
+        "mean": 17.722999848032714,
+        "mean_of_medians": 2.468125,
+        "pct_pixels_at_0": 4.510765155282935,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 2,
+        "split": "train",
+        "files": 4800,
+        "min": 0,
+        "max": 243,
+        "mean": 53.07120095889055,
+        "mean_of_medians": 39.59427083333333,
+        "pct_pixels_at_0": 4.577320206583407,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 2,
+        "split": "val",
+        "files": 1600,
+        "min": 0,
+        "max": 244,
+        "mean": 52.82078856687942,
+        "mean_of_medians": 38.93625,
+        "pct_pixels_at_0": 4.589611999889478,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 2,
+        "split": "test_seen",
+        "files": 1600,
+        "min": 0,
+        "max": 242,
+        "mean": 53.21897570423022,
+        "mean_of_medians": 39.584375,
+        "pct_pixels_at_0": 4.550306524922635,
+        "pct_pixels_at_255": 0.0
+      },
+      {
+        "stain": 2,
+        "split": "test_unseen",
+        "files": 1600,
+        "min": 0,
+        "max": 239,
+        "mean": 55.59682597673519,
+        "mean_of_medians": 42.1265625,
+        "pct_pixels_at_0": 4.357715620855438,
+        "pct_pixels_at_255": 0.0
+      }
+    ]
+  },
+  "check_a": {
+    "count": 1,
+    "blur": 1,
+    "samples": [
+      1,
+      4
+    ],
+    "connectivity": "4-connected (scipy.ndimage.label default)",
+    "min_containment": 0.9,
+    "max_area_ratio": 0.7,
+    "measurements": [
+      {
+        "sample": 1,
+        "otsu_w1": 67.5,
+        "otsu_w2": 77.5,
+        "area_w1": 742,
+        "area_w2": 2424,
+        "overlap": 742,
+        "containment_w1_in_w2": 1.0,
+        "containment_w2_in_w1": 0.3061056105610561,
+        "area_ratio_w1_over_w2": 0.3061056105610561,
+        "area_ratio_w2_over_w1": 3.266846361185984
+      },
+      {
+        "sample": 4,
+        "otsu_w1": 60.5,
+        "otsu_w2": 77.5,
+        "area_w1": 791,
+        "area_w2": 3187,
+        "overlap": 791,
+        "containment_w1_in_w2": 1.0,
+        "containment_w2_in_w1": 0.24819579541888923,
+        "area_ratio_w1_over_w2": 0.24819579541888923,
+        "area_ratio_w2_over_w1": 4.029077117572693
+      }
+    ],
+    "w1_passes": true,
+    "w2_passes": false
+  },
+  "documented_nuclei_stain": 2,
+  "nuclei_stain": 1,
+  "conflict_with_documentation": true,
+  "decision": "nuclei = w1, conflict with the documentation"
+}

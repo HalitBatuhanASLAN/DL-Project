@@ -1,0 +1,17 @@
+{
+  "args": {
+    "script": "scripts/check_stain.py"
+  },
+  "seed": null,
+  "command": [
+    "scripts/check_stain.py"
+  ],
+  "git_commit": "4df88ec1ef05a56a7d187511940bf2bc83a6ba28",
+  "rules_sha256": "a67348b3648dac8f0f4af4c701055fbaac3d69b2bbbd76c82126907f2bb68333",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}
