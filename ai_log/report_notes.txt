@@ -1,0 +1,65 @@
+CSE655 TERM PROJECT - REPORT NOTES (running log)
+Last update: 2026-11-04
+
+1. DATASET SELECTION
+- Candidates reviewed: UTKFace, APPA-REAL, RSNA Bone Age, PetFinder Pawpularity,
+  ShanghaiTech, FG-NET, dSprites, BBBC005.
+- Chosen: BBBC005 v1 (Broad Bioimage Benchmark Collection), synthetic fluorescent
+  cell images, target = cell count (1-100). 19,200 TIF images, 696x520, 8-bit.
+  License: CC0. Link: https://bbbc.broadinstitute.org/BBBC005
+  Citation: Ljosa et al., Nature Methods, 2012.
+- Why: visually simple task -> small from-scratch CNN can reach the 1.15x MAE_best
+  criterion; low compute/CO2; no personal data (no privacy/ethics issues); listed in
+  the project spec as an example ("synthetic cell-count sets").
+- Rejected:
+  * Pawpularity: SOTA barely beats mean baseline -> 0.6x MAE_mean criterion infeasible.
+  * ShanghaiTech, FG-NET: fewer than 2,000 images.
+  * RSNA Bone Age: large X-rays -> high compute/CO2.
+  * APPA-REAL: noisy crops, extra cleaning work.
+  * UTKFace: pretrained models have a large advantage on faces -> high risk of failing
+    1.15x criterion -> extra runs -> extra CO2; also requires bias/ethics analysis.
+  * dSprites: rotation target ambiguous (shape symmetry); position target too trivial.
+- Bias analysis: not applicable (no demographic groups). Optional: error per blur level / stain.
+- To justify later: subset choice (blur levels), image size (64 vs 128), discrete count values.
+- Data leakage risk: the same simulated scene exists at several blur levels and two stains.
+  Split must be GROUPED (same cell count + sample id -> same split). Verify on file names in Stage 1.
+- Expected structure (to verify): 19,200 files = 2 stains x 16 blur levels x 600 scenes
+  (24 counts x 25 samples). So only ~600 independent scenes -> "19,200 images" overstates diversity;
+  report both numbers. Limitation: synthetic data, no claim about real microscopy images.
+- License wording: quote the official page sentence (CC0 waiver by Anne Carpenter); re-check page.
+
+2. COMPUTE / HARDWARE
+- Initial plan: write code locally (VS Code), run all reported experiments on Google Colab (T4).
+- Changed to: local machine with NVIDIA GPU.
+  Reasons: same hardware for all runs (fair comparison), real location = Turkey (TUR grid
+  intensity), no session disconnects / random GPU assignment.
+- Hardware: NVIDIA GeForce RTX 3050 Ti Laptop GPU, 4 GB VRAM, compute capability 8.6.
+  Driver 551.23 (max CUDA 12.4). Windows, Python 3.11. Location: Turkey.
+- Software: torch 2.6.0+cu124, torchvision 0.21.0+cu124, cuDNN 9.1.0, codecarbon 3.3.2,
+  numpy 2.4.6, pandas 3.1.1, scikit-learn 1.9.1.
+- Note: latest torch (2.15) ships only CUDA 13.x builds; driver supports max CUDA 12.4,
+  so torch 2.6.0 (newest cu124 build) was used.
+- CodeCarbon smoke test (10 s GPU matmul, country=TUR): 0.000188 kWh, 0.0000875 kg CO2eq
+  (implied grid intensity ~465 g CO2eq/kWh). GPU measured via NVML, CPU via Windows EMI,
+  RAM estimated -> mention in limitations.
+- 4 GB VRAM limits batch size / resolution -> supports small-model + mixed-precision choices.
+
+3. PROTOCOL RULES (adopted from day 1)
+- Every training/evaluation run tracked with CodeCarbon, failed runs included.
+- Fixed seed, fixed train/val/test split for all models.
+- Test set used once per final model; all tuning on validation.
+- All reported runs on the same hardware.
+- Laptop measurement conditions: always on AC power, same Windows power mode,
+  no heavy background apps during runs.
+
+4. AI USAGE (for AI Usage Report)
+- Tool: Claude (claude.ai) - project understanding, dataset selection, planning.
+- Case #1 (AI error): another AI recommended UTKFace, claiming bias analysis is a
+  separate "10-point" item. Checked against spec: bias analysis is part of the dataset
+  section and only required "if the dataset has group labels" -> claim was wrong.
+  Same answer said BBBC005 license was unverified; official page states CC0.
+- Coding will be done via separate English-language chats; outputs reviewed and logged.
+- Entry #2 (2026-11-04/05): Claude Desktop - environment setup. Found CPU-only torch,
+  installed CUDA 12.4 build, wrote scripts/check_env.py (CodeCarbon smoke test),
+  .gitignore, requirements.txt, README setup. Verified: CUDA available, git status
+  excluded .venv/ and data/. Kept as is.
