@@ -8,6 +8,7 @@ import json
 
 import numpy as np
 import pandas as pd
+import torch
 
 from src.common import PROJECT_ROOT, RESULTS_DIR, sha256
 
@@ -38,6 +39,13 @@ def load_norm_stats(resolution):
     """Return (mean, std) of the train pixels at this resolution (section 6)."""
     stats = json.loads(NORM_STATS_JSON.read_text(encoding="utf-8"))["resolutions"][resolution]
     return stats["mean"], stats["std"]
+
+
+def to_model_input(images, resolution, device):
+    """Turn uint8 images N x H x W into normalised float tensors N x 1 x H x W (section 6)."""
+    mean, std = load_norm_stats(resolution)
+    pixels = torch.from_numpy(images).to(device).float() / 255
+    return ((pixels - mean) / std).unsqueeze(1)  # unsqueeze adds the channel axis.
 
 
 def save_predictions(path, model, scene_ids, counts, blurs, predictions):

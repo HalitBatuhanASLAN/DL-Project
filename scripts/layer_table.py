@@ -111,7 +111,7 @@ def per_layer_table(model, resolution):
 def counted_macs(model, resolution):
     """Return the MACs from FlopCounterMode. Eval mode, so BatchNorm counts as 0 (section 11.7)."""
     model.eval()
-    with torch.no_grad(), FlopCounterMode(model, display=False) as counter:
+    with torch.no_grad(), FlopCounterMode(display=False) as counter:
         model(input_tensor(resolution))
     return counter.get_total_flops() // 2
 
@@ -175,7 +175,7 @@ def main():
                 )
                 totals.append(row)
 
-        totals = pd.DataFrame(totals)
+        totals = pd.DataFrame(totals).convert_dtypes()  # Whole numbers, even with gaps.
         own_128 = totals[(totals["model"] == "own_cnn") & (totals["resolution"] == "128x96")]
         checks[f"own_cnn: receptive field = {EXPECTED_RF}"] = (
             own_128["receptive_field"].iloc[0] == EXPECTED_RF
@@ -185,7 +185,7 @@ def main():
         check_table = pd.DataFrame(
             [{"check": name, "result": "PASS" if ok else "FAIL"} for name, ok in checks.items()]
         )
-        markdown += ["", "## Totals", "", markdown_table(totals.fillna("-").astype(str))]
+        markdown += ["", "## Totals", "", markdown_table(totals.astype(str).replace("<NA>", "-"))]
         markdown += ["", "## Checks", "", markdown_table(check_table), ""]
         (OUT_DIR / "model_tables.md").write_text("\n".join(markdown), encoding="utf-8", newline="\n")
 

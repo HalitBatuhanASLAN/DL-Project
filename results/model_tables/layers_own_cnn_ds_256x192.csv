@@ -1,0 +1,28 @@
+layer,type,output_shape,params,receptive_field,jump,macs
+1,Conv2d,16 x 192 x 256,144,3,1,7077888
+2,BatchNorm2d,16 x 192 x 256,32,3,1,0
+3,ReLU,16 x 192 x 256,0,3,1,0
+4,AvgPool2d,16 x 96 x 128,0,4,2,0
+5,Conv2d,16 x 96 x 128,144,8,2,1769472
+6,BatchNorm2d,16 x 96 x 128,32,8,2,0
+7,ReLU,16 x 96 x 128,0,8,2,0
+8,Conv2d,32 x 96 x 128,512,8,2,6291456
+9,BatchNorm2d,32 x 96 x 128,64,8,2,0
+10,ReLU,32 x 96 x 128,0,8,2,0
+11,AvgPool2d,32 x 48 x 64,0,10,4,0
+12,Conv2d,32 x 48 x 64,288,18,4,884736
+13,BatchNorm2d,32 x 48 x 64,64,18,4,0
+14,ReLU,32 x 48 x 64,0,18,4,0
+15,Conv2d,64 x 48 x 64,2048,18,4,6291456
+16,BatchNorm2d,64 x 48 x 64,128,18,4,0
+17,ReLU,64 x 48 x 64,0,18,4,0
+18,AvgPool2d,64 x 24 x 32,0,22,8,0
+19,Conv2d,64 x 24 x 32,576,38,8,442368
+20,BatchNorm2d,64 x 24 x 32,128,38,8,0
+21,ReLU,64 x 24 x 32,0,38,8,0
+22,Conv2d,64 x 24 x 32,4096,38,8,3145728
+23,BatchNorm2d,64 x 24 x 32,128,38,8,0
+24,ReLU,64 x 24 x 32,0,38,8,0
+25,AdaptiveAvgPool2d,64 x 1 x 1,0,whole image,-,0
+26,Flatten,64,0,whole image,-,0
+27,Linear,1,65,whole image,-,64
