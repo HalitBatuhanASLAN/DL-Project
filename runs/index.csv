@@ -1,0 +1,4 @@
+run_id,start_time,category,model,status,duration_s,energy_kwh,emissions_kg,short_run,notes
+_env_check,2026-11-05T00:50:26,env,none,ok,10.180356499971822,0.0001882762760136225,8.747052196806481e-05,True,"legacy format, pre-helper, not re-run"
+20261105-221607_analysis_none_21b5,2026-11-05T22:16:07,analysis,none,ok,34.00621909997426,0.00035274705989591244,0.00016388134556880239,False,
+20261105-221700_preprocess_none_fc37,2026-11-05T22:17:00,preprocess,none,ok,0.41489519993774593,3.578977280538458e-06,1.6627427388562402e-06,True,

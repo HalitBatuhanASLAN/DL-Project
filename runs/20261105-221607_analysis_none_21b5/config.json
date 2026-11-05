@@ -1,0 +1,18 @@
+{
+  "args": {
+    "script": "scripts/data_inventory.py",
+    "seed": 42
+  },
+  "seed": 42,
+  "command": [
+    "scripts/data_inventory.py"
+  ],
+  "git_commit": "2bdd08b8487826d6fbe648c3f2f94527ac5b2efe",
+  "rules_sha256": "a67348b3648dac8f0f4af4c701055fbaac3d69b2bbbd76c82126907f2bb68333",
+  "splits_sha256": null,
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}

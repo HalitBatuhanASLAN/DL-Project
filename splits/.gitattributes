@@ -1,0 +1,3 @@
+# Store these byte for byte: git's CRLF conversion would break the recorded SHA-256.
+splits.csv -text
+splits.sha256 -text
