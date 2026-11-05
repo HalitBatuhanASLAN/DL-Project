@@ -12,3 +12,4 @@ synthetic_helper_test_20261105,2026-11-05,env,none,failed,0.15,1.7e-08,,True,"sy
 20261105-225713_baseline_mean_and_brightness_6ea7,2026-11-05T22:57:13,baseline,mean_and_brightness,ok,10.635259100003168,0.0001072060193902903,4.9806415724457406e-05,True,
 untracked_metrics_selftest_20261105,2026-11-05T22:56:30,analysis,none,ok,1.15,,,True,"untracked, not measured; src.metrics self-test, synthetic numbers, start time approximate"
 untracked_size_check_20261105,2026-11-05T23:08:30,measure,none,ok,2,,,True,"untracked, not measured; size check of candidate models on CPU, no data, duration is an estimate"
+20261105-233130_baseline_mean_and_brightness_03b5,2026-11-05T23:31:30,baseline,mean_and_brightness,ok,17.864622300025076,0.00017003238385019504,7.899466508342671e-05,False,

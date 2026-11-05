@@ -1,5 +1,5 @@
 {
-  "rules_version": "rules-v1.1",
+  "rules_version": "rules-v2",
   "resolution": "128x96",
   "train_mean": 50.05,
   "n_val_images": 400,

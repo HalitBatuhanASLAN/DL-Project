@@ -1,5 +1,5 @@
 {
-  "rules_version": "rules-v1.1",
+  "rules_version": "rules-v2",
   "model": "count = a + b * feature",
   "feature": "mean uint8 pixel value of the cached image",
   "resolution": "128x96",

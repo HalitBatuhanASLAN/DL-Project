@@ -8,6 +8,8 @@ Output: results/baselines/brightness_params.json  a and b, fitted on train
         results/baselines_val_per_blur.csv        val metrics per blur level
         results/baselines/val_predictions.csv     one row per val image (section 11.8)
         results/val_predictions/baselines.csv     same rows, next to the CNN predictions
+        results/baselines/val_predictions.csv     one row per val image (section 11.8)
+        results/val_predictions/baselines.csv     same rows, next to the CNN predictions
 
 Run with the project virtual environment, after committing this script:
     .venv\\Scripts\\python.exe scripts\\baselines.py
@@ -136,6 +138,23 @@ def main():
         }
         VAL_JSON.write_text(json.dumps(val_results, indent=2) + "\n", encoding="utf-8", newline="\n")
         per_blur.to_csv(PER_BLUR_CSV, index=False, lineterminator="\n")
+
+        # One row per val image, mean rows first, then brightness rows (section 11.8).
+        tables = [
+            pd.DataFrame(
+                {
+                    "model": name,
+                    "scene_id": val_scenes,
+                    "count": val_counts.astype(int),
+                    "blur": val_blurs,
+                    "prediction": pred,
+                }
+            )
+            for name, pred in predictions.items()
+        ]
+        for path in PREDICTION_CSVS:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            pd.concat(tables).to_csv(path, index=False, lineterminator="\n")
 
         # Print.
         print(f"Train mean {train_mean:.4f}. Brightness fit: a = {a:.6f}, b = {b:.6f}")

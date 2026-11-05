@@ -1,0 +1,9 @@
+{
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 17.864622300025076,
+  "energy_kwh": 0.00017003238385019504,
+  "emissions_kg": 7.899466508342671e-05,
+  "short_run": false
+}
