@@ -1,5 +1,5 @@
 {
-  "version": "rules-v1.1",
+  "version": "rules-v2",
   "doc": "docs/decision_rules.md",
   "data": {
     "raw_dir": "data/raw/BBBC005_v1_images",
@@ -60,7 +60,8 @@
   },
   "baselines": {
     "mean": {"expected_train_mean": 50.05, "expected_test_seen_mae": 25.85},
-    "brightness": {"feature": "mean_uint8_cached_image", "model": "ols_linear", "fit_on": "train"}
+    "brightness": {"feature": "mean_uint8_cached_image", "model": "ols_linear", "fit_on": "train"},
+    "val_predictions": {"file": "results/baselines/val_predictions.csv", "made_by": "one_more_tracked_run_of_baselines_py"}
   },
   "evaluation": {
     "metrics": ["mae", "rmse", "r2"],
@@ -76,7 +77,117 @@
     "force_requires_reason": true,
     "log": "results/test_log.csv",
     "ablations_on": "val",
-    "aggregate_only_exception": "check_F_file_sanity"
+    "aggregate_only_exception": "check_F_file_sanity",
+    "cache_build_exception": "scripts/build_cache.py",
+    "predictions_dir": "results/test_predictions",
+    "beats_brightness": {
+      "set": "test_seen",
+      "statistic": "mae_cnn_over_mae_brightness",
+      "paired": true,
+      "wins_if_ci_high_below": 1.0,
+      "energy_ratio": "gross_energy_per_1000_predictions_cpu"
+    }
+  },
+  "models": {
+    "own_cnn": {
+      "channels": [16, 32, 64, 64],
+      "kernel": 3,
+      "pool": "avg_2x2_after_blocks_1_2_3",
+      "head": "gap_linear",
+      "norm": "batchnorm",
+      "params": 60465,
+      "macs_128x96": 37158976,
+      "seeds": [42, 43, 44]
+    },
+    "standard_1": {
+      "name": "resnet18",
+      "weights": "IMAGENET1K_V1",
+      "seeds": [42],
+      "fine_tune": "all_layers"
+    },
+    "standard_2": {
+      "name": "mobilenet_v3_small",
+      "weights": "IMAGENET1K_V1",
+      "seeds": [42, 43, 44],
+      "fine_tune": "all_layers",
+      "classifier_dropout": 0.0
+    },
+    "final_seed": 42,
+    "conv1_input": "sum_rgb_to_1_channel",
+    "failed_runs": "technical_crash_repeat_same_seed_bad_training_not_replaced"
+  },
+  "training": {
+    "loss": "l1",
+    "optimizer": "adamw",
+    "weight_decay": 0.0001,
+    "schedule": "cosine_to_zero",
+    "warmup_steps": 0,
+    "batch_size": 32,
+    "drop_last": true,
+    "max_steps": 3000,
+    "output_bias_init": 0.5005,
+    "amp_default": false,
+    "cudnn_deterministic": true,
+    "cudnn_benchmark": false,
+    "data_on_gpu": true,
+    "num_workers": 0,
+    "early_stopping": {
+      "metric": "val_mae_cells",
+      "eval_every_steps": 150,
+      "min_delta_cells": 0.02,
+      "patience_evals": 6,
+      "no_stop_before_step": 1500,
+      "keep_best_checkpoint": true
+    }
+  },
+  "lr_search": {
+    "grid": [0.0001, 0.0003, 0.001, 0.003],
+    "steps": 300,
+    "seed": 42,
+    "schedule": "cosine_over_trial",
+    "choose": "lowest_val_mae_tie_lower_lr",
+    "edge_values": {"below": 0.00003, "above": 0.01}
+  },
+  "ablations": {
+    "on": "val",
+    "seed": 42,
+    "model": "own_cnn",
+    "lr": "reuse_parent",
+    "variants": {
+      "resolution": "256x192",
+      "depthwise_separable": {"blocks": [2, 3, 4], "params": 8449, "macs_128x96": 6475840}
+    }
+  },
+  "efficiency_runs": {
+    "amp": {"model": "standard_1", "seed": 42, "lr": "reuse_parent"},
+    "amp_noise_reference": {"model": "standard_1", "seed": 42, "lr": "reuse_parent", "amp": false, "steps": 600, "compare": "energy_per_step"},
+    "report_without_extra_runs": ["caching", "early_stopping"],
+    "not_used": ["quantization", "pruning", "distillation"]
+  },
+  "measurement": {
+    "macs_tool": "torch.utils.flop_counter.FlopCounterMode",
+    "images": "val",
+    "latency": {
+      "batch_size": 1,
+      "devices": ["gpu", "cpu"],
+      "warmup_passes": 200,
+      "timed_passes": 1000,
+      "repeats": 5
+    },
+    "energy_per_1000": {
+      "devices": {"cpu": "all_models", "gpu": "cnns"},
+      "min_loop_s": 60,
+      "repeats": 3,
+      "idle_s": 60,
+      "report": ["gross", "net"],
+      "ratio_uses": "cpu_gross"
+    }
+  },
+  "reporting": {
+    "footprint": ["final_run_seed42", "seed42_plus_model_lr_trials", "project_total"],
+    "training_energy": "absolute_values_no_ratio",
+    "residuals_by_count": {"val": "every_model", "test": "final_models"},
+    "max_planned_steps": 34200
   },
   "carbon": {
     "tracker": "OfflineEmissionsTracker",
@@ -84,6 +195,7 @@
     "measure_power_secs": 5,
     "short_run_factor": 3,
     "index": "runs/index.csv",
-    "categories": ["env", "preprocess", "analysis", "baseline", "search", "train", "eval", "measure"]
+    "categories": ["env", "preprocess", "analysis", "baseline", "search", "train", "eval", "measure"],
+    "untracked_runs_note": "untracked, not measured"
   }
 }

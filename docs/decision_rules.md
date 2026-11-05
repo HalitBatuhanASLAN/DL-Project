@@ -1,13 +1,27 @@
-# Decision rules — rules-v1.1
+# Decision rules — rules-v2
 
 `rules-v1` was frozen and tagged before any check, split or training run. `rules-v1.1` revises
-check 2 of section 4 after that check had run; see "Changes from rules-v1".
+check 2 of section 4 after that check had run; see "Changes from rules-v1". `rules-v2` freezes
+training, measurement and reporting before the first training run; see "Changes from rules-v1.1".
 Machine-readable copy: `configs/rules.json`. If the two disagree, this file is wrong and must be fixed
 with a new tag; no rule changes after a check has run, except via a new tagged version with a reason.
 
 Provenance: drafted with Claude (Desktop chat, 2026-11-05), reviewed and edited by me in the project
 chat. My decisions and reasons: hold out 4 counts, light visual check, resolution and blur levels by
 pre-registered rules (see ai_log/report_notes.txt).
+
+## Changes from rules-v1.1
+- Added: section 11. Changed: sections 0, 9 and 10. Sections 1-8 are unchanged, including the
+  acceptance rule.
+- State at freezing: no model trained, no LR search run, no test metric computed. Val baselines
+  are known (mean MAE 25.85, brightness MAE 1.08).
+- Disclosure: the comparison with the brightness baseline was added after seeing that val result.
+  The section 9 exception for build_cache.py and the tracking of all runs were written after
+  those runs had happened; they describe past behaviour and do not make it pre-registered.
+- Correction before freezing: my first wording of the own-CNN reason said the network sees "about
+  6 nuclei" at once. That was wrong: 38 px is about 6.5 nucleus diameters across, a width and not
+  a number of nuclei, and an area that wide can hold far more than 6 nuclei at high counts.
+  Section 11 has the corrected reason.
 
 ## Changes from rules-v1
 - What changed (section 4, check 2 only):
@@ -33,7 +47,8 @@ pre-registered rules (see ai_log/report_notes.txt).
 
 ## 0. Scope
 Covers data preparation, baselines, evaluation and test protocol.
-Training budget (steps, early stopping) is frozen separately (`rules-v2`) before the first training run.
+Training, measurement and reporting are frozen in section 11 (`rules-v2`), before the first
+training run.
 
 ## 1. Data and scenes
 - Source: BBBC005 v1, 19,200 TIF files, expected 520×696 (H×W), uint8. Any file that differs → stop.
@@ -135,6 +150,12 @@ Training budget (steps, early stopping) is frozen separately (`rules-v2`) before
 - All tuning, early stopping and ablations use val. An ablation variant evaluated on test counts as an extra logged test use.
 - Exception, documented: the file-sanity check (check F) reads all 19,200 files, including test files,
   for aggregate statistics only (shape, dtype, min/max/mean). No test image is displayed or used for any choice.
+- Exception, documented: `scripts/build_cache.py` reads the test TIFs to write the test cache, and
+  reads the test npz files back for format checks (shape, dtype, image count, scene structure,
+  NaN, SHA-256). No test pixel statistic is reported or used for any choice.
+- `scripts/evaluate_test.py` saves one row per test image (model, scene_id, count, blur, prediction)
+  to `results/test_predictions/`. Paired ratios and residuals are computed from those rows, so no
+  test image is loaded again.
 
 ## 10. Carbon tracking
 - Every compute script runs inside `tracked_run()` (src/carbon.py): OfflineEmissionsTracker,
@@ -145,3 +166,116 @@ Training budget (steps, early stopping) is frozen separately (`rules-v2`) before
 - short_run = duration < 3 × measure_power_secs → reported as "below measurement resolution".
 - Project total = sum over `runs/index.csv`, failed runs included. Legacy `_env_check` row added without re-running.
 - The first run of scripts/data_inventory.py was untracked; it is re-run once under the helper.
+- Every run, including size checks and self-tests, runs inside `tracked_run()`.
+- A run is any execution of a project script, or any code that loads data or builds a model.
+  Git commands, shell one-liners that load no data, and reading or editing log files are not runs.
+- Runs that were not tracked are added to `runs/index.csv` with `append_index_row`: energy and
+  emissions stay empty, duration is approximate, and the notes column says "untracked, not measured".
+  The project total includes their duration but no energy for them.
+
+## 11. Training, measurement and reporting
+
+### Decisions and reasons
+- Own CNN: design B, 4 blocks 16-32-64-64, avg-pool after blocks 1-3, GAP, linear. The
+  depthwise-separable variant (blocks 2-4) is the 2nd ablation.
+  Reason: It is small and simple, I can compute every layer by hand,
+  and its last layer sees an area about 6.5 nucleus diameters wide.
+- Seeds: own CNN and MobileNetV3-Small with 3 seeds (42, 43, 44) on val; ResNet-18 with 1 seed (42).
+  Seed 42 is the final model for each test run, fixed now.
+  Reason: Repeating the small models is cheap, but ResNet-18 is about 11 times more expensive
+  per step, so I run it only once to save energy.
+- Budget: max 3,000 steps with the early-stopping rule below.
+  Reason: 1,500 steps may be too short for a model trained from scratch, and early stopping
+  will stop it sooner if it stops improving.
+- "CNN beats brightness" = the 95% paired scene-bootstrap CI of MAE_cnn / MAE_brightness on
+  test_seen lies entirely below 1; the energy ratio is reported next to it. Energy ratio = gross
+  energy per 1,000 predictions on CPU, for both models. Training energy is reported as absolute
+  values, with no ratio.
+  Reason: The test set has only 100 scenes, so a small difference can be just noise; I only
+  call it a win if the whole interval is below 1.
+- The acceptance rule of section 8 stays as the course defines it. Every model is also compared
+  with the brightness baseline (error and energy).
+
+### 11.1 Models
+- Own CNN, input 1 x 96 x 128. Block = 3x3 conv (padding 1, no bias), BatchNorm, ReLU.
+  Blocks 16-32-64-64, 2x2 average pooling after blocks 1-3, GAP, linear to 1 output.
+  60,465 parameters, 37,158,976 MACs, receptive field 38 px at the last conv.
+- Standard models: ResNet-18 and MobileNetV3-Small, ImageNet weights (IMAGENET1K_V1), stock
+  architecture, same input and normalisation as the own CNN.
+  Conv1 weights summed over RGB (section 6). Last linear layer replaced by 1 output.
+  MobileNet classifier dropout set to 0. All layers trained with one LR; BatchNorm in train mode.
+- Every model: output bias starts at 0.5005. New layers use the PyTorch default initialisation.
+- ImageNet weights: one-time download inside `tracked_run` (category env), recorded in the README
+  with file hashes. Their pre-training footprint is discussed qualitatively in the report.
+
+### 11.2 Training (identical for every model)
+- Loss L1 on count / 100. AdamW, weight decay 1e-4 on all parameters.
+- Cosine LR from the chosen value to 0 over 3,000 steps, no warm-up.
+- Batch size 32, drop_last. Data held as tensors on the GPU, no workers.
+- Mixed precision off, except the one measured run in 11.5.
+- cudnn.deterministic = True, cudnn.benchmark = False. Python, NumPy, torch and CUDA seeds all fixed.
+
+### 11.3 Early stopping (identical for every model)
+- Evaluate val MAE in cells, in eval mode, every 150 steps.
+- Improvement = val MAE ≤ best − 0.02 cells. An improvement saves the checkpoint and resets
+  the counter; anything else adds 1 to the counter.
+- Stop at the first evaluation with step ≥ 1,500 and counter ≥ 6, otherwise at step 3,000.
+- The saved checkpoint is the model. Evaluations count as part of the run.
+
+### 11.4 LR search
+- Grid 1e-4, 3e-4, 1e-3, 3e-3, 300 steps each, full train set, seed 42, cosine over 300 steps.
+- Each trial is its own tracked run, category search.
+- Choice: lowest val MAE at step 300; a tie goes to the lower LR.
+- If the best LR is on the edge of the grid, one more value beyond it (3e-5 below, 1e-2 above),
+  for any model. Same choice rule.
+- Ablations and the mixed-precision runs reuse the LR of their parent model.
+
+### 11.5 Ablations and efficiency runs (val only, seed 42, own CNN unless stated)
+- Resolution: same network at 256x192.
+- Depthwise-separable: blocks 2-4 become 3x3 depthwise, BN, ReLU, 1x1, BN, ReLU.
+  8,449 parameters, 6,475,840 MACs.
+- Mixed precision: ResNet-18, seed 42, same LR, same training rules.
+- Noise reference for that comparison: one ResNet-18 repeat without mixed precision, 600 steps,
+  seed 42, same LR. The mixed-precision comparison uses energy per step.
+- Reported without extra training: caching and early stopping.
+- Quantization, pruning and distillation are not used.
+
+### 11.6 Failed runs
+- A crash from a technical cause may be repeated with the same seed; both runs stay in the index.
+- A model that trains badly is not replaced. Seed 42 stays the final model, and the budget stays
+  3,000 steps.
+
+### 11.7 Measurement
+- MACs: `torch.utils.flop_counter.FlopCounterMode`, 2 flops = 1 MAC. BN and pooling count as 0.
+- Latency: eval mode, no_grad, batch size 1, on GPU and CPU, on val images. 200 warm-up passes,
+  then 5 repeats of 1,000 timed passes; median and p95. torch.cuda.synchronize() before each
+  GPU timer read. CPU thread count fixed.
+- Energy per 1,000 predictions: on val images, category measure, on CPU for every model including
+  brightness, and on GPU for the CNNs. Loop of at least 60 s, 3 repeats, after a 60 s idle
+  measurement. Gross and net of idle are both reported; the energy ratio uses CPU gross.
+
+### 11.8 Reporting
+- Footprint three ways: final training run (seed 42); training incl. LR search (seed 42 plus that
+  model's trials); project total (`runs/index.csv`, all seeds, ablations and failed runs).
+- Maximum planned training is 34,200 steps: LR search 3,600 (+300 per model if the edge rule
+  applies), 7 final runs 21,000, resolution and depthwise-separable ablations 6,000,
+  mixed-precision run 3,000, noise reference 600.
+- Each CNN's ratio to brightness is reported separately, with its CI. test_unseen ratios are a
+  diagnostic only.
+- Residuals by count are reported for every model, on val for all models and on test for final models.
+- Val predictions per image are saved for every model. Mean and brightness get theirs from one
+  more tracked run of `scripts/baselines.py`, to `results/baselines/val_predictions.csv`.
+- Val spread over seeds is reported for the own CNN and MobileNetV3-Small. ResNet-18 has none.
+
+Known limitations:
+- Early stopping may rarely fire: it cannot stop before step 1,500, and under cosine decay the error
+  usually keeps improving late. A stop at step 2,000 still has about 25 % of the starting LR, so the
+  model misses its best low-LR phase.
+- "About 11 times more expensive per step" is a MACs figure (424.9 M vs 37.16 M). Real GPU energy
+  per step does not scale exactly with MACs. ResNet-18 has one seed, so its result may not be typical.
+- Three CNNs are each compared with brightness, with no correction for multiple comparisons, so
+  one could win by chance.
+- Choosing the LR from 300 steps favours fast starters, such as pretrained models and higher LRs.
+  A 3,000-step run might prefer a lower LR.
+- Ablations have one seed. A difference smaller than the spread over the 3 own-CNN seeds is called
+  "no clear difference".
