@@ -8,7 +8,6 @@ Output: results/baselines/brightness_params.json  a and b, fitted on train
         results/baselines_val_per_blur.csv        val metrics per blur level
         results/baselines/val_predictions.csv     one row per val image (section 11.8)
         results/val_predictions/baselines.csv     same rows, next to the CNN predictions
-        results/val_predictions/baselines.csv     same rows, next to the CNN predictions
 
 Run with the project virtual environment, after committing this script:
     .venv\\Scripts\\python.exe scripts\\baselines.py
