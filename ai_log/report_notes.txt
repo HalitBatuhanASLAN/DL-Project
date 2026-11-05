@@ -158,3 +158,17 @@ Last update: 2026-11-05
   Visual checks energy: 0.00184 kWh; project total so far 0.00238 kWh (7 runs).
 - Limitations to state: check-2 flaw and its correction (if revised, report BOTH v1 and v2
   outcomes); blur metric range smaller than expected -> K came from the spec-driven minimum.
+- 2026-11-05 data-v2 (rules-v1.1): check 2 revised (peak smoothing sigma = d_native/4, i.e.
+  nucleus scale). Peaks per C100 image 86-93 (v1: 154-185). Retention 0.993/1.000/1.000.
+  FINAL DATA DECISIONS: nuclei stain w1 (docs say w2), main 128x96, ablation 256x192,
+  blur levels F1, F26, F39, F48 (K = 4 from the spec-driven minimum).
+  Images: 4 levels x 600 scenes = 2,400 -> train 1,200 / val 400 / test_seen 400 / test_unseen 400.
+- Report honestly: rules-v1.1 was written AFTER seeing the v1 outcome and a diagnostic (not
+  pre-registered); the change came only from sigma; show the v1 and v1.1 results side by side;
+  the resolution ablation (128x96 vs 256x192) is the empirical confirmation.
+- Limitations: (1) touching nuclei merge and dim nuclei are missed by the peak finder -> hardest
+  pairs excluded from check 2; (2) cells can be cut by the image border (seen in check A figure:
+  C1 cells at the top/left edge) -> visible count can be below the label at high counts, giving
+  an error floor; (3) blur metric range smaller than expected; (4) synthetic data only.
+- Figure for the report: results/visual_check/stain_overlay.png (caption: w1 object inside w2
+  object, 3-4x smaller -> w1 = nuclei, contrary to the documentation).

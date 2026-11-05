@@ -368,6 +368,24 @@ Rules: real dates only, no backfilling, never invent AI errors.
     test -> must be "failed" (my prompt error; agent flagged it).
 - Decision: see Entry K-2.
 
+## Entry K-2 — 2026-11-05 ~22:50 — Rule revision rules-v1.1 (Claude Desktop, code mode)
+- Logs: ai_log/prompts|sessions/2026-11-05_04_rules_v1_1.md; tags rules-v1.1, data-v2.
+- My decision (with project chat): revise check 2 by ONE stated principle (measure peaks at
+  nucleus scale), keep all thresholds, keep v1 outputs, report both outcomes.
+- Prompt (mine, written in project chat): sigma = d_native/4, window = odd nearest d_native/2,
+  pairs >= d_native/2 apart; rules updated and tagged BEFORE re-running.
+- Result: peaks per C100 image 86-93 (v1: 154-185). Retention 0.993 / 1.000 / 1.000 -> all pass.
+  Decision: main 128x96, ablation 256x192. Blur (at 128x96): F1, F26, F39, F48 (K=4 from clip;
+  D(F48) = 0.18). Stain unchanged: w1.
+- Agent's honest notes (accepted): (1) revision came after seeing v1 outcome and a diagnostic ->
+  not pre-registered, must say so in the report; (2) my window formula gives 15 px (same as v1)
+  and the distance filter removed 0 pairs -> the whole change came from sigma; (3) touching
+  nuclei merge into one peak and dim nuclei are missed -> the hardest pairs are excluded, so
+  0.993 is an upper estimate; the resolution ablation is the real check.
+- My own "errors": two parts of my fix were no-ops (window, distance filter). Lesson: compute
+  what a formula gives before writing it into a rule.
+- Housekeeping done: synthetic row status corrected to "failed"; notes moved into ai_log/.
+
 ---
 ## Candidate "AI was wrong" cases for the report (real, verified)
 1. Gemini: MAE 6-7 "passes" the 1.15x rule — contradicted by its own later arithmetic.
@@ -397,6 +415,8 @@ Rules: real dates only, no backfilling, never invent AI errors.
 15. Rule design (Desktop chat, I-3, accepted by me): check 2 peak detector at the wrong scale
     (sigma 1 px, window 15 px vs nucleus 31.7 px) -> measured texture, not nucleus separation.
     Caught by the code agent's own diagnostic plot. Shared responsibility: I approved the rule.
+16. Project chat (me + Claude, K-2): two of three parts of the check-2 fix had no effect
+    (window rounds to 15 px; no pair closer than 19 px) -> only sigma mattered. Caught by agent.
 Cross-model observation: with the same first prompt, Gemini, ChatGPT and the separate Claude chat
 all ranked UTKFace first; only the project chat ranked BBBC005 first. All three later switched to
 BBBC005 after seeing that analysis. Two (Claude separate, ChatGPT) independently raised the
