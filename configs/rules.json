@@ -1,0 +1,88 @@
+{
+  "version": "rules-v1",
+  "doc": "docs/decision_rules.md",
+  "data": {
+    "raw_dir": "data/raw/BBBC005_v1_images",
+    "expected_files": 19200,
+    "expected_shape_hw": [520, 696],
+    "expected_dtype": "uint8"
+  },
+  "split": {
+    "seed": 42,
+    "samples": [1, 25],
+    "n_train_samples": 15,
+    "n_val_samples": 5,
+    "n_test_samples": 5,
+    "held_out_counts": [14, 40, 66, 91],
+    "test_unseen_all_samples": true,
+    "file": "splits/splits.csv",
+    "hash_file": "splits/splits.sha256"
+  },
+  "stain": {
+    "documented_nuclei_stain": 2,
+    "count": 1,
+    "blur": 1,
+    "n_samples": 2,
+    "min_containment": 0.90,
+    "max_area_ratio": 0.70
+  },
+  "resolution": {
+    "candidates_wh": [[128, 96], [256, 192], [348, 260]],
+    "ablation_for": {"128x96": "256x192", "256x192": "128x96", "348x260": "256x192"},
+    "resize": "PIL_BOX",
+    "size_check": {"count": 1, "blur": 1, "n_samples": 5, "min_median_diameter_px": 3.0},
+    "pair_check": {
+      "count": 100,
+      "blur": 1,
+      "n_samples": 5,
+      "peak_smoothing_sigma_px": 1.0,
+      "peak_window_rule": "odd_nearest_d_native_half_min3",
+      "line_points": 21,
+      "max_saddle_to_peak": 0.80,
+      "min_resolved_retention": 0.90
+    }
+  },
+  "blur": {
+    "scenes": "first_train_sample_x_seen_counts",
+    "highpass_sigma_rule": "d_native_half_div_factor",
+    "d_step": 0.20,
+    "k_min": 4,
+    "k_max": 6,
+    "always_include": [1, 48]
+  },
+  "preprocess": {
+    "target_scale": 100,
+    "normalisation": "scalar_train_mean_std",
+    "augmentation": {"hflip_p": 0.5, "vflip_p": 0.5},
+    "pretrained_conv1": "sum_rgb",
+    "prediction_postprocess": "none"
+  },
+  "baselines": {
+    "mean": {"expected_train_mean": 50.05, "expected_test_seen_mae": 25.85},
+    "brightness": {"feature": "mean_uint8_cached_image", "model": "ols_linear", "fit_on": "train"}
+  },
+  "evaluation": {
+    "metrics": ["mae", "rmse", "r2"],
+    "primary_set": "test_seen",
+    "diagnostic_set": "test_unseen",
+    "acceptance": {"ratio_best": 1.15, "ratio_mean": 0.60, "decide_on": "point_estimate"},
+    "bootstrap": {"unit": "scene", "n": 10000, "seed": 42, "ci": 0.95, "method": "percentile", "paired_ratio": true}
+  },
+  "test_protocol": {
+    "script": "scripts/evaluate_test.py",
+    "final_models": ["mean", "brightness", "own_cnn", "standard_1", "standard_2"],
+    "runs_per_model": 1,
+    "force_requires_reason": true,
+    "log": "results/test_log.csv",
+    "ablations_on": "val",
+    "aggregate_only_exception": "check_F_file_sanity"
+  },
+  "carbon": {
+    "tracker": "OfflineEmissionsTracker",
+    "country_iso_code": "TUR",
+    "measure_power_secs": 5,
+    "short_run_factor": 3,
+    "index": "runs/index.csv",
+    "categories": ["env", "preprocess", "analysis", "baseline", "search", "train", "eval", "measure"]
+  }
+}
