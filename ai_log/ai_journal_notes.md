@@ -26,7 +26,11 @@ Rules: real dates only, no backfilling, never invent AI errors.
 - Gemini: https://share.gemini.google/luuknxEZ0bfa (created 2026-11-04 20:51)
 - ChatGPT: https://chatgpt.com/share/6aecb395-27c0-83eb-926f-bf6d4b88a8d7 (2026-11-04 ~20:54)
 - Claude (separate): https://claude.ai/share/41fdf8fa-e2a5-4a5f-a6b7-985901012a1c (2026-11-04 ~20:50)
-- Claude (project chat): export TODO
+- Claude (project chat): https://claude.ai/share/3359d3d5-a588-4b07-8095-e9bca530f365
+- Claude Desktop coding sessions: no share links (code mode). Full exports in the repo:
+  ai_log/transcripts/ (masked Markdown), ai_log/prompts/, ai_log/sessions/.
+- Spec wording (CSE655 §4.2): "Attach the full chat exports or links as an appendix."
+  -> exports are enough; plan: attach both links and exports (PDF) where available.
 
 ---
 
@@ -148,6 +152,44 @@ Rules: real dates only, no backfilling, never invent AI errors.
   local Windows GPU machine -> caught by checking wheel size / CUDA flag.
 - Accepted: all setup files as is.
 
+## Entry G — 2026-11-05 — Data inventory (Claude Desktop, agent)
+- Phase: Data | Tool: Claude Desktop (agent, ran commands locally)
+- Goal: verify BBBC005 structure before any design decision.
+- Prompt: English prompt written in the project chat (inventory only, no decisions; test the
+  hypothesis "each (count, sample) pair is one scene at every blur level and both stains").
+- Response (key facts): 19,200 TIF + 1 .htaccess; pattern SIMCEPImages_<well>_C<count>_F<blur>_s<sample>_w<stain>.TIF;
+  24 counts (1-100), 16 blur levels (F1-F48), 25 samples, 2 stains; fully balanced;
+  600 unique scenes x 32 images each -> hypothesis PASS. Well field is redundant
+  (row = blur, column = count). Images: 8-bit greyscale 696x520.
+- Beyond the prompt: added a pixel-correlation check on 20 scenes (same scene F1 vs F48: r = 0.89;
+  different scene: r ~ 0) because names alone cannot prove "same scene". Also hashed all files
+  (no duplicates; not in the committed script). Added "Co-Authored-By: Claude" to the commit.
+- Accepted: script, index CSV, summary; the extra pixel check (stronger evidence, clearly labelled
+  as "evidence, not proof" on 20/600 scenes).
+- Checked by me / project chat: numbers consistent (600 x 32 = 19,200; 24 x 25 = 600);
+  matches Tiny-BBBC005 paper description. Stain meaning not in the zip; SSC case-study page says
+  w1 = cell body stain, w2 = nuclei stain (to confirm visually).
+- Notes: sample index s is only meaningful within one count -> scene ID must be (count, sample).
+  Commit created locally (bbb3055), not pushed yet.
+- Errors: none found. Good example of the agent reporting its own extra steps and limits.
+
+## Entry H — 2026-11-05 — AI usage logging setup (Claude Desktop, agent)
+- Phase: Project management | Tool: Claude Desktop (agent)
+- Goal: store full transcripts of coding sessions in the repo (no share links in code mode).
+- Prompt: written in the project chat (find local session transcripts, copy raw + readable
+  Markdown, scan for secrets, write prompt/session logs, commit).
+- What happened: while searching the computer for transcript files, the agent read data from
+  UNRELATED projects (a participant-style folder code, other project paths, session titles
+  including a patient-information form). The repo is PUBLIC. The agent noticed this itself,
+  did not commit, and asked how to publish (cut raw / masked Markdown / no raw on GitHub).
+- Decision (with project chat): do not publish raw transcripts; commit only masked Markdown;
+  keep raw files locally and git-ignore ai_log/transcripts/raw/; manually check the masking.
+- Errors / risks: broad file search went outside the project scope -> privacy risk.
+  Detected by the agent's own secret/privacy scan before commit. If missed: other projects'
+  sensitive details would have been public on GitHub.
+- Reflection: TODO (my own words). Lesson candidate: tell agents the allowed folder scope
+  explicitly; review before anything is pushed to a public repo.
+
 ---
 ## Candidate "AI was wrong" cases for the report (real, verified)
 1. Gemini: MAE 6-7 "passes" the 1.15x rule — contradicted by its own later arithmetic.
@@ -159,6 +201,8 @@ Rules: real dates only, no backfilling, never invent AI errors.
 7. ChatGPT: "no CC0 label on BBBC005 page" (to re-verify) and "use all 19,200 images" (ignores
    that they are renderings of fewer unique scenes).
 8. ChatGPT: first answer never considered BBBC005; listed Pawpularity.
+9. Claude Desktop: transcript search read unrelated projects' data (privacy risk on a public
+   repo); caught by its own scan before commit.
 Cross-model observation: with the same first prompt, Gemini, ChatGPT and the separate Claude chat
 all ranked UTKFace first; only the project chat ranked BBBC005 first. All three later switched to
 BBBC005 after seeing that analysis. Two (Claude separate, ChatGPT) independently raised the

@@ -23,9 +23,13 @@ Last update: 2026-11-04
 - To justify later: subset choice (blur levels), image size (64 vs 128), discrete count values.
 - Data leakage risk: the same simulated scene exists at several blur levels and two stains.
   Split must be GROUPED (same cell count + sample id -> same split). Verify on file names in Stage 1.
-- Expected structure (to verify): 19,200 files = 2 stains x 16 blur levels x 600 scenes
-  (24 counts x 25 samples). So only ~600 independent scenes -> "19,200 images" overstates diversity;
-  report both numbers. Limitation: synthetic data, no claim about real microscopy images.
+- VERIFIED 2026-11-05 (scripts/data_inventory.py, results/data_inventory.txt):
+  19,200 TIF = 600 scenes (24 counts x 25 samples) x 16 blur levels x 2 stains, fully balanced.
+  Counts: 1,5,10,...,100 (24 values). Blur: F1..F48 (16 values). Images 8-bit grey 696x520.
+  Scene ID = (count, sample). Well field redundant (row=blur, column=count).
+  Pixel check (20 scenes): same scene F1 vs F48 r=0.89; different scenes r~0.
+  -> only 600 independent scenes; "19,200 images" overstates diversity; report both numbers.
+  Limitation: synthetic data, no claim about real microscopy images.
 - License wording: quote the official page sentence (CC0 waiver by Anne Carpenter); re-check page.
 
 2. COMPUTE / HARDWARE
