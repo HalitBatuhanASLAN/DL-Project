@@ -1,5 +1,5 @@
 {
-  "version": "rules-v1",
+  "version": "rules-v1.1",
   "doc": "docs/decision_rules.md",
   "data": {
     "raw_dir": "data/raw/BBBC005_v1_images",
@@ -35,8 +35,9 @@
       "count": 100,
       "blur": 1,
       "n_samples": 5,
-      "peak_smoothing_sigma_px": 1.0,
+      "peak_smoothing_sigma_rule": "d_native_div_4",
       "peak_window_rule": "odd_nearest_d_native_half_min3",
+      "min_pair_distance_rule": "d_native_div_2",
       "line_points": 21,
       "max_saddle_to_peak": 0.80,
       "min_resolved_retention": 0.90

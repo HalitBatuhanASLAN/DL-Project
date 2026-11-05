@@ -1,12 +1,35 @@
-# Decision rules — rules-v1
+# Decision rules — rules-v1.1
 
-Frozen and tagged `rules-v1` before any check, split or training run.
+`rules-v1` was frozen and tagged before any check, split or training run. `rules-v1.1` revises
+check 2 of section 4 after that check had run; see "Changes from rules-v1".
 Machine-readable copy: `configs/rules.json`. If the two disagree, this file is wrong and must be fixed
 with a new tag; no rule changes after a check has run, except via a new tagged version with a reason.
 
 Provenance: drafted with Claude (Desktop chat, 2026-11-05), reviewed and edited by me in the project
 chat. My decisions and reasons: hold out 4 counts, light visual check, resolution and blur levels by
 pre-registered rules (see ai_log/report_notes.txt).
+
+## Changes from rules-v1
+- What changed (section 4, check 2 only):
+  peak smoothing σ = 1.0 px → σ = d_native / 4; new condition that a pair counts as a candidate
+  pair only if its centres are ≥ d_native / 2 apart. The window wording is kept as "odd integer
+  nearest to d_native/2", which is the same 15 px as before at d_native = 31.7 px.
+  Everything else is unchanged: 0.80 dip, 0.90 retention, 21 points, candidate order, ablation mapping.
+- Principle (the only one): peaks and pairs are measured at nucleus scale. d_native = 31.7 px, and
+  the rules-v1 detector worked at sub-nucleus scale (σ 1 px, window 15 px).
+- Reason: check 2 is meant to test whether separate nuclei stay separate. Under rules-v1 it mostly
+  tested texture inside single nuclei: 164, 154, 157, 160, 185 peaks in 100-nuclei images (samples
+  1, 4, 7, 8, 10), and 80 % of the 540 pairs closer than one nucleus diameter.
+- rules-v1 outcome: check 1 passed at all candidates. Check 2 retention (299 pairs resolved at
+  native): 128×96 0.63, 256×192 0.86, 348×260 0.8997 (269 of 299). No candidate passed both, so the
+  fallback applied: main 348×260, ablation 256×192. Blur levels F1, F23, F39, F48, K = 4.
+  Tag `data-v1`; decision files kept as `results/decisions/*_v1.json`.
+- Disclosure: this revision was made after seeing that outcome, and after seeing a diagnostic on
+  the same pairs (retention 0.95 / 0.99 / 1.00 for pairs ≥ d_native apart). It is not pre-registered
+  in the sense of rules-v1. The values follow from the principle and were not tuned to a result.
+- Stain result (section 3, rule unchanged, check not repeated): nuclei = w1, in conflict with the
+  BBBC page, which says w2. C1 F1, samples 1 and 4: containment(w1 in w2) 1.00 / 1.00, area ratio
+  0.31 / 0.25. `results/decisions/stain.json` stands.
 
 ## 0. Scope
 Covers data preparation, baselines, evaluation and test protocol.
@@ -52,13 +75,15 @@ Training budget (steps, early stopping) is frozen separately (`rules-v2`) before
   Why 3 px: smallest blob with a centre pixel brighter than its 3×3 neighbours; below it,
   appearance depends on sub-pixel position (aliasing).
 - Check 2 (separation): C100 F1, first 5 training samples.
-  Peaks at native: gaussian_filter(σ = 1.0 px), local maxima with maximum_filter
+  Peaks at native: gaussian_filter(σ = d_native/4), local maxima with maximum_filter
   (window = odd integer nearest to d_native/2, min 3), value > Otsu threshold of the smoothed image.
-  Pairs: each peak with its nearest neighbour; unordered, duplicates removed.
+  Pairs: each peak with its nearest neighbour; unordered, duplicates removed. Of these, only pairs
+  with centres ≥ d_native/2 apart are candidate pairs; all counts below are over candidate pairs.
   Dip test (unsmoothed image at the resolution tested): 21 points on the segment between the two centres,
   bilinear; centre mapping (r, c) → ((r+0.5)/f_y − 0.5, (c+0.5)/f_x − 0.5).
   Resolved if min(points 1..19) ≤ 0.80 × min(point 0, point 20).
   Pass if ≥ 90 % of pairs resolved at native remain resolved at the candidate.
+  Why d_native/4 and d_native/2: peaks and pairs are measured at nucleus scale, not on texture.
   Why 0.80: a ≥ 20 % dip is a common "resolved" margin, close to Rayleigh (~26 % dip).
   Why 90 %: tolerance convention; small separability loss at C100 accepted.
 - Decision: 128×96 passes both → main 128×96, ablation 256×192.
