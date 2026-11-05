@@ -1,0 +1,28 @@
+{
+  "args": {
+    "rules_version": "rules-v1.1",
+    "stain": 1,
+    "blur_levels": [
+      1,
+      26,
+      39,
+      48
+    ],
+    "resolutions": [
+      "128x96",
+      "256x192"
+    ]
+  },
+  "seed": null,
+  "command": [
+    "scripts/build_cache.py"
+  ],
+  "git_commit": "c9a5f2767c69eb9dff5783c63de757596e8780ed",
+  "rules_sha256": "abc1b3435307d39bf1baed65a43ae4d387f7d708df93d9a60fa3be3576e448d9",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}

@@ -1,0 +1,11 @@
+{
+  "rules_version": "rules-v1.1",
+  "model": "count = a + b * feature",
+  "feature": "mean uint8 pixel value of the cached image",
+  "resolution": "128x96",
+  "a": -3.2252728450530124,
+  "b": 3.1484945772288495,
+  "fit_on": "train",
+  "n_train_images": 1200,
+  "train_r2": 0.9976113233710284
+}

@@ -1,0 +1,172 @@
+{
+  "rules_version": "rules-v1.1",
+  "nuclei_stain": 1,
+  "blur_levels": [
+    1,
+    26,
+    39,
+    48
+  ],
+  "main_resolution": "128x96",
+  "ablation_resolution": "256x192",
+  "resize": "PIL_BOX",
+  "cache_dir": "data/cache",
+  "files": [
+    {
+      "file": "train_128x96.npz",
+      "split": "train",
+      "resolution": "128x96",
+      "images_shape": [
+        1200,
+        96,
+        128
+      ],
+      "n_images": 1200,
+      "n_scenes": 300,
+      "size_bytes": 14804196,
+      "sha256": "2fdb6b1d890012ca2aaefa7cb9596c3e6c03088a9a9f9308b6127dd1af00cb96"
+    },
+    {
+      "file": "val_128x96.npz",
+      "split": "val",
+      "resolution": "128x96",
+      "images_shape": [
+        400,
+        96,
+        128
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 4935396,
+      "sha256": "a88bbb4b6c281dc3323ebf6895a207169e27bda85ece10ee4181ccba3843e330"
+    },
+    {
+      "file": "test_seen_128x96.npz",
+      "split": "test_seen",
+      "resolution": "128x96",
+      "images_shape": [
+        400,
+        96,
+        128
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 4935396,
+      "sha256": "e16d2bb6ed65a6470e3a45e98f8a6a570faf92e7ec3b60ff6b5375aab1b815a9"
+    },
+    {
+      "file": "test_unseen_128x96.npz",
+      "split": "test_unseen",
+      "resolution": "128x96",
+      "images_shape": [
+        400,
+        96,
+        128
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 4933796,
+      "sha256": "21decb1b1acf86747364a4e9eb46bb325431d74b94b37399bebe8be792b1299a"
+    },
+    {
+      "file": "train_256x192.npz",
+      "split": "train",
+      "resolution": "256x192",
+      "images_shape": [
+        1200,
+        192,
+        256
+      ],
+      "n_images": 1200,
+      "n_scenes": 300,
+      "size_bytes": 59040996,
+      "sha256": "04ecd092a14a8d11c8ccd5810238dfadf4f18506e0c057e13d3baf60e1433016"
+    },
+    {
+      "file": "val_256x192.npz",
+      "split": "val",
+      "resolution": "256x192",
+      "images_shape": [
+        400,
+        192,
+        256
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 19680996,
+      "sha256": "1345a88a98121f8916fd8ccf4efb30a590b4ee233653024a1d83fadf1f6adf2b"
+    },
+    {
+      "file": "test_seen_256x192.npz",
+      "split": "test_seen",
+      "resolution": "256x192",
+      "images_shape": [
+        400,
+        192,
+        256
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 19680996,
+      "sha256": "db248136c8ee07426566d1cfaf96f831ac2c6a8a75ba23362dc913960217826a"
+    },
+    {
+      "file": "test_unseen_256x192.npz",
+      "split": "test_unseen",
+      "resolution": "256x192",
+      "images_shape": [
+        400,
+        192,
+        256
+      ],
+      "n_images": 400,
+      "n_scenes": 100,
+      "size_bytes": 19679396,
+      "sha256": "d5c4daa7a606699e2ee66a443cfcf2e193310e365a4861f4b02fbd57a0a1e691"
+    }
+  ],
+  "all_checks_passed": true,
+  "checks": {
+    "train_128x96: 1200 images": true,
+    "train_128x96: shape N x H x W": true,
+    "train_128x96: dtype uint8": true,
+    "train_128x96: 4 images per scene, one per level": true,
+    "train_128x96: no NaN": true,
+    "val_128x96: 400 images": true,
+    "val_128x96: shape N x H x W": true,
+    "val_128x96: dtype uint8": true,
+    "val_128x96: 4 images per scene, one per level": true,
+    "val_128x96: no NaN": true,
+    "test_seen_128x96: 400 images": true,
+    "test_seen_128x96: shape N x H x W": true,
+    "test_seen_128x96: dtype uint8": true,
+    "test_seen_128x96: 4 images per scene, one per level": true,
+    "test_seen_128x96: no NaN": true,
+    "test_unseen_128x96: 400 images": true,
+    "test_unseen_128x96: shape N x H x W": true,
+    "test_unseen_128x96: dtype uint8": true,
+    "test_unseen_128x96: 4 images per scene, one per level": true,
+    "test_unseen_128x96: no NaN": true,
+    "train_256x192: 1200 images": true,
+    "train_256x192: shape N x H x W": true,
+    "train_256x192: dtype uint8": true,
+    "train_256x192: 4 images per scene, one per level": true,
+    "train_256x192: no NaN": true,
+    "val_256x192: 400 images": true,
+    "val_256x192: shape N x H x W": true,
+    "val_256x192: dtype uint8": true,
+    "val_256x192: 4 images per scene, one per level": true,
+    "val_256x192: no NaN": true,
+    "test_seen_256x192: 400 images": true,
+    "test_seen_256x192: shape N x H x W": true,
+    "test_seen_256x192: dtype uint8": true,
+    "test_seen_256x192: 4 images per scene, one per level": true,
+    "test_seen_256x192: no NaN": true,
+    "test_unseen_256x192: 400 images": true,
+    "test_unseen_256x192: shape N x H x W": true,
+    "test_unseen_256x192: dtype uint8": true,
+    "test_unseen_256x192: 4 images per scene, one per level": true,
+    "test_unseen_256x192: no NaN": true,
+    "train mean target = 50.05": true
+  }
+}

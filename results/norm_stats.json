@@ -1,0 +1,16 @@
+{
+  "rules_version": "rules-v1.1",
+  "definition": "x = (u8/255 - mean) / std, over all train pixels",
+  "resolutions": {
+    "128x96": {
+      "mean": 0.06635635967711737,
+      "std": 0.13337538066757781,
+      "n_pixels": 14745600
+    },
+    "256x192": {
+      "mean": 0.06653661604073054,
+      "std": 0.1351616629174123,
+      "n_pixels": 58982400
+    }
+  }
+}
