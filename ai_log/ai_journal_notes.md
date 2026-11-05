@@ -386,6 +386,56 @@ Rules: real dates only, no backfilling, never invent AI errors.
   what a formula gives before writing it into a rule.
 - Housekeeping done: synthetic row status corrected to "failed"; notes moved into ai_log/.
 
+## Entry L — 2026-11-05 ~23:00 — Cache + baselines (Claude Desktop, code mode)
+- Logs: ai_log/prompts|sessions/2026-11-05_05_cache_baselines.md; tag cache-v1 (077a8e3).
+- Results: 41/41 cache checks PASS (1200/400/400/400 images at 128x96 and 256x192; 4 images per
+  scene; train mean 50.05). Norm stats 128x96: mean 0.0664, std 0.1334.
+  Val baselines (128x96, 100 scenes, bootstrap): mean MAE 25.85; BRIGHTNESS MAE 1.08
+  [0.93, 1.23], R2 0.998 (a = -3.23, b = 3.15 cells per grey level). Brightness MAE rises with
+  blur: F1 0.90, F26 1.02, F39 1.15, F48 1.25.
+- Key finding: one number per image (mean brightness) almost solves the task -> the spec's
+  0.6 x MAE_mean condition (15.5 cells) is nearly empty; the binding test is 1.15 x MAE_best.
+- Agent flagged: build_cache.py reads test files for checks (needs a rule exception); metrics
+  self-test ran untracked; residuals by count not yet checked; R2 of mean baseline is 0 by
+  construction. It asked whether rules-v2 should add brightness to the acceptance rule.
+- My decision (project chat): do NOT change the acceptance rule (defined by the course spec, not
+  by us). Add brightness as a mandatory REPORTED reference: "does the CNN beat a 2-parameter
+  linear model, and at what energy?" -> central question of the report.
+
+## Entry M — 2026-11-05 ~23:10 — Training options for rules-v2 (Claude Desktop, same chat)
+- Prompt: written in the project chat (11 questions: architecture, loss, optimizer, budget,
+  early stopping, LR search, standard models, AMP/seeds, ablation, efficiency techniques,
+  measurement, fairness risks).
+- Response (key part): own CNN B = 4 blocks (16-32-64-64), 3x3 conv + BN + ReLU, avg-pool after
+  blocks 1-3, GAP + linear; 60,465 params, 37.16 M MACs at 128x96, RF 38 px (6.5 nuclei).
+  L1 loss, AdamW, cosine, wd 1e-4, batch 32, output bias 0.5005, max 3,000 steps, early stopping
+  (val every 150 steps, min delta 0.02, patience 6, no stop before 1,500). LR grid 4 x 3 models
+  x 300 steps. Stock ResNet-18 and MobileNetV3-Small, full fine-tuning, 1-channel conv1.
+  Depthwise-separable variant as 2nd ablation (6.48 M MACs). FlopCounterMode for MACs.
+- Verified by me (hand calculation, project chat): every params/MACs/RF number in the layer table
+  is correct (e.g. conv2 MACs 3x3x16x32x48x64 = 14,155,776; RF 3 -> 4 -> 8 -> 10 -> 18 -> 22 -> 38).
+- Valuable warnings: MobileNetV3-Small needs fewer MACs (13.5 M) than the own CNN (37.2 M) ->
+  "own CNN = green" would be false; same-step budget is not same-energy; stock nets downsample
+  hard at 128x96; freeze a definition of "CNN beats brightness" in advance.
+- Issues: (1) another untracked size-check run (~2 s CPU) outside tracked_run; (2) it says it
+  did not read the spec PDF; (3) 3 seeds for ALL models triples cost, incl. ResNet-18 -> to decide.
+- AI-authorship question (mine): spec allows AI code but "you are fully responsible"; exam asks
+  to justify choices; lecturer said the project should be "your work, not AI work". Decision:
+  AI proposes options, I choose with my own reasons, and I hand-check every number I report.
+
+## Entry N — 2026-11-05 ~23:20 — Freezing rules-v2 (Claude Desktop, same chat)
+- My decisions 1A/2B/3B/4A; reasons drafted in simple sentences in the project chat, sent verbatim.
+- Agent's review of MY reasons: "it can see a group of about 6 nuclei" was wrong -> the 38 px RF
+  is ~6.5 nucleus DIAMETERS wide and can contain many more nuclei. Replaced; the wrong wording is
+  documented in "Changes from rules-v1.1". (Project-chat error; would have hurt in the exam.)
+- Other agent points accepted: run definition; build_cache exception wording (it also wrote the
+  test cache, not only checks); energy ratio vs brightness = gross CPU energy per 1,000
+  predictions (net energy of brightness is below measurement resolution); training energy as
+  absolute values. Added by me: 600-step ResNet-18 non-AMP repeat as noise reference; val
+  predictions for both baselines. Known limitations listed in section 11.8.
+- Result: rules-v2 committed (ed258d7), index rows for 2 untracked runs (4dd6d6c), tag rules-v2.
+  Planned maximum 34,200 training steps.
+
 ---
 ## Candidate "AI was wrong" cases for the report (real, verified)
 1. Gemini: MAE 6-7 "passes" the 1.15x rule — contradicted by its own later arithmetic.
@@ -417,6 +467,10 @@ Rules: real dates only, no backfilling, never invent AI errors.
     Caught by the code agent's own diagnostic plot. Shared responsibility: I approved the rule.
 16. Project chat (me + Claude, K-2): two of three parts of the check-2 fix had no effect
     (window rounds to 15 px; no pair closer than 19 px) -> only sigma mattered. Caught by agent.
+17. (watch) Claude Desktop code (Entry L): build_cache.py reads test TIFs/npz for format checks,
+    outside the written test-protocol exception; metrics self-test ran untracked. Agent flagged both.
+18. Project chat (N): my drafted reason "sees about 6 nuclei" confused RF width (6.5 diameters)
+    with the number of nuclei; caught by the Desktop agent.
 Cross-model observation: with the same first prompt, Gemini, ChatGPT and the separate Claude chat
 all ranked UTKFace first; only the project chat ranked BBBC005 first. All three later switched to
 BBBC005 after seeing that analysis. Two (Claude separate, ChatGPT) independently raised the

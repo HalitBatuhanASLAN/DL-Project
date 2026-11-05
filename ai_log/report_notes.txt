@@ -172,3 +172,33 @@ Last update: 2026-11-05
   an error floor; (3) blur metric range smaller than expected; (4) synthetic data only.
 - Figure for the report: results/visual_check/stain_overlay.png (caption: w1 object inside w2
   object, 3-4x smaller -> w1 = nuclei, contrary to the documentation).
+- 2026-11-05 cache-v1: caches built (140.8 MiB, gitignored, hashed). Val baselines at 128x96:
+  mean MAE 25.85; brightness OLS MAE 1.08 [0.93, 1.23], R2 0.998, a = -3.23, b = 3.15.
+  Brightness MAE by blur: 0.90 / 1.02 / 1.15 / 1.25 (F1/F26/F39/F48).
+- CENTRAL STORY for the report: mean image brightness ~ count (total fluorescence). A
+  2-parameter linear model reaches ~1 cell. Acceptance rule unchanged (it is the course's rule),
+  but every model is ALSO compared with brightness (error AND energy). Discussion: when is a
+  CNN worth its carbon? Green-AI angle: the cheapest model may be almost good enough.
+- Exam angle: a CNN with global average pooling can represent "mean brightness" directly
+  (one channel ~ identity, GAP = mean) -> the CNN must add local counting (overlap, blur) to beat it.
+- To add in rules-v2: test-file access exception for build_cache format checks; log the
+  untracked metrics self-test; residual-by-count analysis for every model.
+- DECISIONS for rules-v2 (2026-11-05 23:16, my choices from AI-proposed options):
+  1A Own CNN = design B: 4 blocks 16-32-64-64, 3x3 conv (no bias) + BN + ReLU, 2x2 avg-pool
+     after blocks 1-3, GAP, linear (bias init 0.5005). 60,465 params, 37.16 M MACs at 128x96,
+     RF 38 px (~6.5 nuclei). Depthwise-separable variant (6.48 M MACs) = 2nd ablation.
+  2B Seeds: own CNN and MobileNetV3-Small 3 seeds (42, 43, 44) on val; ResNet-18 1 seed (42).
+     Seed 42 is the final model for the test run (fixed in advance).
+  3B Max 3,000 steps (~80 epochs at batch 32); early stopping: val every 150 steps,
+     min delta 0.02 cells, patience 6, no stop before step 1,500, keep best checkpoint.
+  4A "CNN beats brightness" = 95% paired scene-bootstrap CI of MAE_cnn / MAE_brightness on
+     test_seen lies entirely below 1. Energy ratio reported next to it.
+  Accepted as proposed: L1 loss, AdamW, cosine to 0, wd 1e-4, batch 32, LR grid
+  {1e-4, 3e-4, 1e-3, 3e-3} x 300 steps per model, stock ResNet-18 / MobileNetV3-Small with
+  1-channel conv1 (sum RGB), full fine-tuning, MobileNet dropout 0, AMP off + one measured AMP
+  run on ResNet-18, deterministic cuDNN, FlopCounterMode for MACs, latency median/p95 at batch 1.
+  Reasons (my words): TODO - write one sentence per decision before freezing.
+- 2026-11-05 rules-v2 frozen (tag rules-v2, 4dd6d6c). 1A reason corrected: last layer sees an
+  area about 6.5 nucleus diameters wide (not "6 nuclei"). Energy ratio vs brightness = gross CPU
+  energy per 1,000 predictions; training energy absolute. Extra runs: ResNet-18 600-step non-AMP
+  noise reference; baselines val predictions. Max 34,200 training steps.
