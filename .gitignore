@@ -15,3 +15,6 @@ data/
 
 # CodeCarbon local config
 .codecarbon.config
+
+# Raw AI session transcripts stay local (masked Markdown is committed instead)
+ai_log/transcripts/raw/
