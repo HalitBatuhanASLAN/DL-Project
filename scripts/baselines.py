@@ -6,6 +6,8 @@ touched only through the labels in splits/splits.csv, for the analytic check at 
 Output: results/baselines/brightness_params.json  a and b, fitted on train
         results/baselines_val.json                val MAE, RMSE, R2 with scene bootstrap CIs
         results/baselines_val_per_blur.csv        val metrics per blur level
+        results/baselines/val_predictions.csv     one row per val image (section 11.8)
+        results/val_predictions/baselines.csv     same rows, next to the CNN predictions
 
 Run with the project virtual environment, after committing this script:
     .venv\\Scripts\\python.exe scripts\\baselines.py
@@ -22,33 +24,19 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))  # Lets Python find the src package.
 
 from src.carbon import tracked_run  # noqa: E402 (needs the line above)
-from src.common import (  # noqa: E402
-    RESULTS_DIR,
-    load_decision,
-    load_rules,
-    load_split_table,
-    sha256,
-)
+from src.common import RESULTS_DIR, load_decision, load_rules, load_split_table  # noqa: E402
+from src.data import load_train_or_val  # noqa: E402
 from src.metrics import CI, N_BOOT, SEED, bootstrap_ci, mae, r2, rmse  # noqa: E402
 
-CACHE_DIR = PROJECT_ROOT / "data" / "cache"
-MANIFEST_JSON = RESULTS_DIR / "cache_manifest.json"
 PARAMS_JSON = RESULTS_DIR / "baselines" / "brightness_params.json"
 VAL_JSON = RESULTS_DIR / "baselines_val.json"
 PER_BLUR_CSV = RESULTS_DIR / "baselines_val_per_blur.csv"
+# The first path is the one in the rules, the second is the folder for all val predictions.
+PREDICTION_CSVS = [
+    RESULTS_DIR / "baselines" / "val_predictions.csv",
+    RESULTS_DIR / "val_predictions" / "baselines.csv",
+]
 METRICS = {"mae": mae, "rmse": rmse, "r2": r2}
-
-
-def load_cache(split, resolution, manifest):
-    """Load one cache file after checking its SHA-256. Refuses test files (section 9)."""
-    if split not in ("train", "val"):
-        raise SystemExit(f"baselines.py must not open {split}")
-    path = CACHE_DIR / f"{split}_{resolution}.npz"
-    expected = {entry["file"]: entry["sha256"] for entry in manifest["files"]}[path.name]
-    if sha256(path) != expected:
-        raise SystemExit(f"{path.name} does not match results/cache_manifest.json")
-    with np.load(path) as cache:
-        return cache["images"], cache["count"], cache["blur"], cache["scene_id"]
 
 
 def brightness_feature(images):
@@ -84,12 +72,11 @@ def main():
     stain = load_decision("stain.json")["nuclei_stain"]
     levels = load_decision("blur_levels.json")["chosen_levels"]
     resolution = load_decision("resolution.json")["main_resolution"]
-    manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
 
     config = {"rules_version": rules["version"], "resolution": resolution, "seed": SEED}
     with tracked_run(category="baseline", model="mean_and_brightness", config=config):
-        train_images, train_counts, _, _ = load_cache("train", resolution, manifest)
-        val_images, val_counts, val_blurs, val_scenes = load_cache("val", resolution, manifest)
+        train_images, train_counts, _, _ = load_train_or_val("train", resolution)
+        val_images, val_counts, val_blurs, val_scenes = load_train_or_val("val", resolution)
         val_counts = val_counts.astype(float)
 
         # Both baselines are fitted on train only.

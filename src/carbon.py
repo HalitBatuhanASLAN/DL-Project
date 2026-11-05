@@ -90,8 +90,12 @@ def describe_environment(config):
 
 
 @contextmanager
-def tracked_run(category, model, config=None):
-    """Measure one script run and record it in runs/. Exceptions are re-raised."""
+def tracked_run(category, model, config=None, notes=""):
+    """Measure one script run and record it in runs/. Exceptions are re-raised.
+
+    notes goes into the notes column of runs/index.csv. A script may write its own results to
+    run_dir/metrics.json; they are kept, and the tracker's numbers are added to them.
+    """
     config = config or {}
     rules = load_rules()["carbon"]
     if category not in rules["categories"]:
@@ -143,6 +147,8 @@ def tracked_run(category, model, config=None):
             "short_run": short_run,
         }
         metrics_path = run_dir / "metrics.json"
+        if metrics_path.exists():  # The script wrote its own results: keep them.
+            metrics = {**json.loads(metrics_path.read_text(encoding="utf-8")), **metrics}
         metrics_path.write_text(json.dumps(metrics, indent=2), encoding="utf-8")
 
         append_index_row(
@@ -156,6 +162,6 @@ def tracked_run(category, model, config=None):
                 "energy_kwh": energy_kwh,
                 "emissions_kg": emissions_kg,
                 "short_run": short_run,
-                "notes": error_type or "",
+                "notes": "; ".join(text for text in (notes, error_type) if text),
             }
         )
