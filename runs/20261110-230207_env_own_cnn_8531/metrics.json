@@ -1,0 +1,29 @@
+{
+  "rules_version": "rules-v2.1",
+  "settings": {
+    "model_name": "own_cnn",
+    "seed": 42,
+    "lr": 0.001,
+    "max_steps": 150,
+    "resolution": "128x96"
+  },
+  "run_ids": [
+    "20261110-230158_env_own_cnn_8a05",
+    "20261110-230204_env_own_cnn_8a05"
+  ],
+  "val_mae": [
+    2.3769052931666375,
+    2.3769052931666375
+  ],
+  "val_mae_identical": true,
+  "weights_bit_identical": true,
+  "largest_abs_difference": 0.0,
+  "largest_difference_tensor": null,
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 0.023988799890503287,
+  "energy_kwh": 1.879777856957845e-08,
+  "emissions_kg": 8.733184754526175e-09,
+  "short_run": true
+}
