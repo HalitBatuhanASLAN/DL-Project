@@ -202,3 +202,7 @@ Last update: 2026-11-05
   area about 6.5 nucleus diameters wide (not "6 nuclei"). Energy ratio vs brightness = gross CPU
   energy per 1,000 predictions; training energy absolute. Extra runs: ResNet-18 600-step non-AMP
   noise reference; baselines val predictions. Max 34,200 training steps.
+- 2026-11-05 infra-v1: layer table verified 25/25; smoke tests OK; GPU peak 494 MiB.
+  Report finding: MobileNetV3-Small ~3x slower per step than own CNN despite 36% of its MACs
+  (depthwise convs are memory-bound on GPU) -> MACs do not predict GPU time/energy.
+  Estimated total training: ~15 min, ~5-22 g CO2 (to be replaced by measured values).

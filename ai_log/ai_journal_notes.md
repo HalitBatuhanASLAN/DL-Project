@@ -436,6 +436,22 @@ Rules: real dates only, no backfilling, never invent AI errors.
 - Result: rules-v2 committed (ed258d7), index rows for 2 untracked runs (4dd6d6c), tag rules-v2.
   Planned maximum 34,200 training steps.
 
+## Entry O — 2026-11-05 ~23:40 — Training infrastructure (Claude Desktop, code mode)
+- Logs: ai_log/prompts|sessions/2026-11-05_06_training_infra.md; tag infra-v1 (ca7a15e).
+- Written: src/models.py, src/data.py, scripts/download_weights.py (I approved the sizes),
+  layer_table.py, train.py, lr_search.py, evaluate_test.py and measure.py (not run).
+- Checks: layer table 25/25 PASS (own CNN 60,465 params / 37,158,976 MACs / RF 38; depthwise
+  8,449 / 6,475,840; ResNet-18 11.17 M / 424.9 M MACs; MobileNetV3-Small 1.52 M / 13.5 M MACs).
+  Baseline val predictions reproduce MAE 25.85 and 1.0806. Smoke tests (20 steps): loss decreased
+  for all 3 models; GPU peak 494 MiB (12% of 4 GB); median step 10 ms / 36 ms / 30 ms.
+- Findings: (1) MobileNetV3-Small has 36% of the own CNN's MACs but is ~3x slower per step ->
+  MACs are a poor proxy for GPU time/energy (report this). (2) ResNet-18 starts at ~131 cells
+  error despite output bias 0.5005, because the new head's weights use default init on 512
+  features. (3) Pretrained models still worse than the mean after 20 steps (ImageNet BN statistics).
+- Agent's own mistakes (reported by itself): a sed edit silently failed -> baselines.py ran twice;
+  layer_table.py ran twice; caught a float32 rounding bug in evaluate_test.py before running.
+- Planned total (rough, below measurement resolution): 34,200 steps ~ 15 min, 5-22 g CO2.
+
 ---
 ## Candidate "AI was wrong" cases for the report (real, verified)
 1. Gemini: MAE 6-7 "passes" the 1.15x rule — contradicted by its own later arithmetic.
@@ -471,6 +487,8 @@ Rules: real dates only, no backfilling, never invent AI errors.
     outside the written test-protocol exception; metrics self-test ran untracked. Agent flagged both.
 18. Project chat (N): my drafted reason "sees about 6 nuclei" confused RF width (6.5 diameters)
     with the number of nuclei; caught by the Desktop agent.
+19. Claude Desktop code (O): a sed edit failed silently -> extra tracked run; detected by its own
+    output check (prediction files missing).
 Cross-model observation: with the same first prompt, Gemini, ChatGPT and the separate Claude chat
 all ranked UTKFace first; only the project chat ranked BBBC005 first. All three later switched to
 BBBC005 after seeing that analysis. Two (Claude separate, ChatGPT) independently raised the
