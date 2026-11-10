@@ -19,6 +19,8 @@ HUB_DIR = PROJECT_ROOT / "checkpoints" / "hub"
 torch.hub.set_dir(str(HUB_DIR))
 
 OUTPUT_BIAS = load_rules()["training"]["output_bias_init"]  # 0.5005 = train mean count / 100.
+# rules-v2.1: the output weights start at 0, so every model starts at the mean baseline.
+assert load_rules()["training"]["output_weight_init"] == "zeros"
 OWN_MODELS = ["own_cnn", "own_cnn_ds"]
 STANDARD_MODELS = ["resnet18", "mobilenet_v3_small"]
 ALL_MODELS = OWN_MODELS + STANDARD_MODELS
@@ -118,14 +120,19 @@ def output_layer(model):
 
 
 def build_model(name, pretrained=True):
-    """Build any model by name and start its output at the mean target (section 11.1)."""
+    """Build any model by name and start its output at the mean target (section 11.1).
+
+    Head weights 0 and bias 0.5005: at step 0 every image gets 0.5005, i.e. 50.05 cells.
+    """
     if name == "own_cnn":
         model = OwnCNN(depthwise=False)
     elif name == "own_cnn_ds":
         model = OwnCNN(depthwise=True)
     else:
         model = build_standard(name, pretrained)
-    nn.init.constant_(output_layer(model).bias, OUTPUT_BIAS)
+    head = output_layer(model)
+    nn.init.zeros_(head.weight)  # rules-v2.1: the output ignores the features at the start.
+    nn.init.constant_(head.bias, OUTPUT_BIAS)
     return model
 
 
