@@ -1,0 +1,57 @@
+{
+  "rules_version": "rules-v2.1",
+  "model": "own_cnn",
+  "resolution": "128x96",
+  "seed": 42,
+  "steps": 300,
+  "grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003
+  ],
+  "edge_rule_lr": 0.01,
+  "chosen_lr": 0.003,
+  "trials": [
+    {
+      "lr": 0.0001,
+      "val_mae_at_last_step": 2.674034396409988,
+      "steps_run": 300,
+      "run_id": "20261110-230223_search_own_cnn_0874",
+      "duration_s": 4.360466599930078,
+      "energy_kwh": 5.780060711012901e-05
+    },
+    {
+      "lr": 0.0003,
+      "val_mae_at_last_step": 2.146545226573944,
+      "steps_run": 300,
+      "run_id": "20261110-230230_search_own_cnn_acd6",
+      "duration_s": 3.178254999918863,
+      "energy_kwh": 6.0342172908975535e-05
+    },
+    {
+      "lr": 0.001,
+      "val_mae_at_last_step": 1.7100671964883805,
+      "steps_run": 300,
+      "run_id": "20261110-230235_search_own_cnn_c9b1",
+      "duration_s": 3.2606420000083745,
+      "energy_kwh": 5.949057357452108e-05
+    },
+    {
+      "lr": 0.003,
+      "val_mae_at_last_step": 1.5483472490310668,
+      "steps_run": 300,
+      "run_id": "20261110-230240_search_own_cnn_48d1",
+      "duration_s": 3.4958888001274318,
+      "energy_kwh": 6.155862203036412e-05
+    },
+    {
+      "lr": 0.01,
+      "val_mae_at_last_step": 1.9067304852604865,
+      "steps_run": 300,
+      "run_id": "20261110-230245_search_own_cnn_2a06",
+      "duration_s": 4.460766199976206,
+      "energy_kwh": 5.998178594789908e-05
+    }
+  ]
+}

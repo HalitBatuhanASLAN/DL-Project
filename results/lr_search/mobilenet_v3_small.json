@@ -1,0 +1,57 @@
+{
+  "rules_version": "rules-v2.1",
+  "model": "mobilenet_v3_small",
+  "resolution": "128x96",
+  "seed": 42,
+  "steps": 300,
+  "grid": [
+    0.0001,
+    0.0003,
+    0.001,
+    0.003
+  ],
+  "edge_rule_lr": 0.01,
+  "chosen_lr": 0.003,
+  "trials": [
+    {
+      "lr": 0.0001,
+      "val_mae_at_last_step": 9.133142379522324,
+      "steps_run": 300,
+      "run_id": "20261110-230307_search_mobilenet_v3_small_25dd",
+      "duration_s": 8.060778300045058,
+      "energy_kwh": 9.70378046868426e-05
+    },
+    {
+      "lr": 0.0003,
+      "val_mae_at_last_step": 7.2930046236515045,
+      "steps_run": 300,
+      "run_id": "20261110-230318_search_mobilenet_v3_small_60a8",
+      "duration_s": 7.997239799937233,
+      "energy_kwh": 0.00010038541410030787
+    },
+    {
+      "lr": 0.001,
+      "val_mae_at_last_step": 7.105423378944397,
+      "steps_run": 300,
+      "run_id": "20261110-230328_search_mobilenet_v3_small_034c",
+      "duration_s": 8.355120599968359,
+      "energy_kwh": 0.00010659462146804737
+    },
+    {
+      "lr": 0.003,
+      "val_mae_at_last_step": 4.096295933425426,
+      "steps_run": 300,
+      "run_id": "20261110-230338_search_mobilenet_v3_small_3559",
+      "duration_s": 8.185541599988937,
+      "energy_kwh": 9.979227454327955e-05
+    },
+    {
+      "lr": 0.01,
+      "val_mae_at_last_step": 6.189971653223037,
+      "steps_run": 300,
+      "run_id": "20261110-230348_search_mobilenet_v3_small_959f",
+      "duration_s": 8.434718600008637,
+      "energy_kwh": 9.800384269641386e-05
+    }
+  ]
+}
