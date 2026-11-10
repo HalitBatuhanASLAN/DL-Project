@@ -1,0 +1,33 @@
+{
+  "checkpoint": "checkpoints\\20261110-231256_train_own_cnn_73cc.pt",
+  "source_run": "20261110-231256_train_own_cnn_73cc",
+  "model": "own_cnn",
+  "resolution": "128x96",
+  "seed": 42,
+  "batch_size": 32,
+  "pre_registered": false,
+  "used_for_choices": false,
+  "n_batchnorm_layers": 4,
+  "n_train_images": 1200,
+  "weights_unchanged": true,
+  "best_val_mae_of_run": 1.3555776637792587,
+  "val_before": {
+    "mae": 1.3555776637792587,
+    "rmse": 1.625279537144795,
+    "r2": 0.9970562869191014
+  },
+  "val_after": {
+    "mae": 5.6720364475250244,
+    "rmse": 6.855926669452478,
+    "r2": 0.9476192550857837
+  },
+  "mae_change": 4.316458783745766,
+  "recalibrated_weights_saved": false,
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 0.7570168001111597,
+  "energy_kwh": 7.53632028669437e-06,
+  "emissions_kg": 3.5012688967141907e-06,
+  "short_run": true
+}

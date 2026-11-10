@@ -1,0 +1,26 @@
+{
+  "checkpoint": "checkpoints\\20261110-232008_train_resnet18_c1c4.pt",
+  "source_run": "20261110-232008_train_resnet18_c1c4",
+  "model": "resnet18",
+  "resolution": "128x96",
+  "seed": 42,
+  "batch_size": 32,
+  "pre_registered": false,
+  "used_for_choices": false,
+  "n_batchnorm_layers": 20,
+  "n_train_images": 1200,
+  "weights_unchanged": true,
+  "best_val_mae_of_run": 2.046683061122894,
+  "val_before": {
+    "mae": 2.046683061122894,
+    "rmse": 2.4821958950969925,
+    "r2": 0.9931338790584068
+  },
+  "val_after": {
+    "mae": 120.73034950405359,
+    "rmse": 203.02839915445372,
+    "r2": -44.93597336953653
+  },
+  "mae_change": 118.6836664429307,
+  "recalibrated_weights_saved": false
+}

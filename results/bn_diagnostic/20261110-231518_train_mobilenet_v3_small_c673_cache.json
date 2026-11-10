@@ -1,0 +1,26 @@
+{
+  "checkpoint": "checkpoints\\20261110-231518_train_mobilenet_v3_small_c673.pt",
+  "source_run": "20261110-231518_train_mobilenet_v3_small_c673",
+  "model": "mobilenet_v3_small",
+  "resolution": "128x96",
+  "seed": 42,
+  "batch_size": 32,
+  "pre_registered": false,
+  "used_for_choices": false,
+  "n_batchnorm_layers": 34,
+  "n_train_images": 1200,
+  "weights_unchanged": true,
+  "best_val_mae_of_run": 1.5132826626300813,
+  "val_before": {
+    "mae": 1.5132826626300813,
+    "rmse": 2.050338456819339,
+    "r2": 0.9953152064417494
+  },
+  "val_after": {
+    "mae": 33.426732277274134,
+    "rmse": 60.518837227707806,
+    "r2": -3.081506506001067
+  },
+  "mae_change": 31.91344961464405,
+  "recalibrated_weights_saved": false
+}
