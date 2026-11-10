@@ -1,0 +1,28 @@
+{
+  "args": {
+    "checkpoint": "checkpoints\\20261110-231256_train_own_cnn_73cc.pt",
+    "source_run": "20261110-231256_train_own_cnn_73cc",
+    "model": "own_cnn",
+    "resolution": "128x96",
+    "seed": 42,
+    "batch_size": 32,
+    "order": "shuffled",
+    "order_seed": 42
+  },
+  "seed": 42,
+  "command": [
+    "scripts/bn_diagnostic.py",
+    "--checkpoint",
+    "checkpoints/20261110-231256_train_own_cnn_73cc.pt",
+    "--order",
+    "shuffled"
+  ],
+  "git_commit": "528ce01a0adf621bedfd2785eaa2db5a01561204",
+  "rules_sha256": "2f288c019867a7f6382948e0b78b89fe6da0117f14b3f7d39ae302a3a4e682d3",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}
