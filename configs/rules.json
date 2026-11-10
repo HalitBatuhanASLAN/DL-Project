@@ -1,5 +1,5 @@
 {
-  "version": "rules-v2",
+  "version": "rules-v2.1",
   "doc": "docs/decision_rules.md",
   "data": {
     "raw_dir": "data/raw/BBBC005_v1_images",
@@ -126,6 +126,7 @@
     "drop_last": true,
     "max_steps": 3000,
     "output_bias_init": 0.5005,
+    "output_weight_init": "zeros",
     "amp_default": false,
     "cudnn_deterministic": true,
     "cudnn_benchmark": false,

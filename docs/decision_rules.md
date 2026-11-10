@@ -1,14 +1,35 @@
-# Decision rules — rules-v2
+# Decision rules — rules-v2.1
 
 `rules-v1` was frozen and tagged before any check, split or training run. `rules-v1.1` revises
 check 2 of section 4 after that check had run; see "Changes from rules-v1". `rules-v2` freezes
 training, measurement and reporting before the first training run; see "Changes from rules-v1.1".
+`rules-v2.1` changes the initialisation of the output layer (section 11.1) before any LR search or
+real training; see "Changes from rules-v2".
 Machine-readable copy: `configs/rules.json`. If the two disagree, this file is wrong and must be fixed
 with a new tag; no rule changes after a check has run, except via a new tagged version with a reason.
 
 Provenance: drafted with Claude (Desktop chat, 2026-11-05), reviewed and edited by me in the project
 chat. My decisions and reasons: hold out 4 counts, light visual check, resolution and blur levels by
 pre-registered rules (see ai_log/report_notes.txt).
+
+## Changes from rules-v2
+- Changed: section 11.1 only. The weights of the final linear layer start at zero for every
+  model (own_cnn, own_cnn_ds, resnet18, mobilenet_v3_small); its bias stays 0.5005. Every other
+  layer is unchanged. `configs/rules.json`: `training.output_weight_init = "zeros"`.
+- Reason (mine, verbatim): "Every model then starts by predicting the training mean, which is
+  exactly the mean baseline, so no model wastes its first steps. ResNet-18 started at about
+  131 cells error with the default head initialisation. The same rule for all models keeps
+  the comparison fair."
+- Observation that led to it: in the infra-v1 smoke tests (20 steps, before any LR search),
+  ResNet-18 started at about 131 cells error despite the output bias 0.5005, because the new head
+  used the default initialisation on 512 features. After 20 steps ResNet-18 (val MAE 56.75) and
+  MobileNetV3-Small (50.41) were still worse than the mean baseline (25.85 on val).
+- Timing: the decision was recorded on 2026-11-05 (ai_log notes) and implemented on 2026-11-10.
+  No training, LR search or test run happened in between; only the 20-step smoke tests existed.
+- Consequence: at step 0 every model predicts 50.05 cells for every image, so its val MAE equals
+  the mean baseline (25.85). Checked by the init check (tag `infra-v1.1`). With zero head weights
+  the first backward pass reaches only the head; the rest of the network gets a gradient from
+  step 2 on, once the head weights are non-zero.
 
 ## Changes from rules-v1.1
 - Added: section 11. Changed: sections 0, 9 and 10. Sections 1-8 are unchanged, including the
@@ -204,7 +225,9 @@ training run.
   architecture, same input and normalisation as the own CNN.
   Conv1 weights summed over RGB (section 6). Last linear layer replaced by 1 output.
   MobileNet classifier dropout set to 0. All layers trained with one LR; BatchNorm in train mode.
-- Every model: output bias starts at 0.5005. New layers use the PyTorch default initialisation.
+- Every model: the final linear layer starts with all weights 0 and bias 0.5005, so every model
+  starts by predicting the training mean (the mean baseline). Other new layers use the PyTorch
+  default initialisation. (rules-v2.1)
 - ImageNet weights: one-time download inside `tracked_run` (category env), recorded in the README
   with file hashes. Their pre-training footprint is discussed qualitatively in the report.
 
