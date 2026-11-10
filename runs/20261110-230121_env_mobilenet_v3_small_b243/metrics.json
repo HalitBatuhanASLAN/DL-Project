@@ -1,0 +1,20 @@
+{
+  "run_id": "20261110-230121_env_mobilenet_v3_small_b243",
+  "model": "mobilenet_v3_small",
+  "val_mae_step0": 25.85,
+  "expected_val_mae": 25.85,
+  "prediction_min_cells": 50.05000305175781,
+  "prediction_max_cells": 50.05000305175781,
+  "head_weight_max_abs": 0.0,
+  "head_bias": 0.5005000233650208,
+  "train_loss_cells": 49.05000329017639,
+  "head_weight_grad_norm": 5.705879211425781,
+  "result": "PASS",
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 0.5979826999828219,
+  "energy_kwh": 8.89467803731393e-06,
+  "emissions_kg": 4.13234289064353e-06,
+  "short_run": true
+}
