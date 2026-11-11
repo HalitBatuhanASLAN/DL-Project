@@ -102,8 +102,8 @@ The diagnostics are post-hoc and val only; the offset correction is never applie
 | 93 | mixed precision (sec. 11.5) | resnet18 seed 42 (final): mWh per step (1800 steps) | 0.6084 | `runs/20261110-232008_train_resnet18_c1c4/metrics.json` |
 | 94 | mixed precision (sec. 11.5) | resnet18 AMP (efficiency run): mWh per step (3000 steps) | 0.4168 | `runs/20261110-232429_train_resnet18_0845/metrics.json` |
 | 95 | mixed precision (sec. 11.5) | resnet18 FP32 600-step noise reference: mWh per step (600 steps) | 0.6061 | `runs/20261110-232634_train_resnet18_8658/metrics.json` |
-| 96 | project total | runs in runs/index.csv (before this summary run) / failed | 107 / 1 | `runs/index.csv` |
-| 97 | project total | energy Wh / g CO2eq / duration s | 32.56 / 15.13 / 3168 | `runs/index.csv` |
+| 96 | project total | runs in runs/index.csv (before this summary run) / failed | 113 / 1 | `runs/index.csv` |
+| 97 | project total | energy Wh / g CO2eq / duration s | 32.76 / 15.22 / 3185 | `runs/index.csv` |
 | 98 | main figure (val-only points) | own_cnn s43: val MAE / x g CO2eq | 1.234 / 0.3023 | `results/figures/main_points.csv` |
 | 99 | main figure (val-only points) | own_cnn s44: val MAE / x g CO2eq | 1.027 / 0.3903 | `results/figures/main_points.csv` |
 | 100 | main figure (val-only points) | mobilenet s43: val MAE / x g CO2eq | 1.514 / 0.6505 | `results/figures/main_points.csv` |
@@ -113,8 +113,8 @@ The diagnostics are post-hoc and val only; the offset correction is never applie
 | 104 | main figure (val-only points) | resnet18 AMP: val MAE / x g CO2eq | 1.543 / 0.9368 | `results/figures/main_points.csv` |
 | 105 | main figure (baselines) | mean: x training / x project g CO2eq | 0.08956 / 1.292 | `results/figures/main_points.csv` |
 | 106 | main figure (baselines) | brightness: x training / x project g CO2eq | 0.08956 / 1.306 | `results/figures/main_points.csv` |
-| 107 | main figure | Pareto front, x = training | brightness | `runs/20261111-191902_analysis_all_final_1852/metrics.json` |
-| 108 | main figure | Pareto front, x = project | mean, brightness | `runs/20261111-191902_analysis_all_final_1852/metrics.json` |
+| 107 | main figure | Pareto front, x = training | brightness | `runs/20261111-195358_analysis_all_final_917c/metrics.json` |
+| 108 | main figure | Pareto front, x = project | brightness | `runs/20261111-195358_analysis_all_final_917c/metrics.json` |
 | 109 | diagnostics a) checkpoint luck | own_cnn seed 42: best val MAE / median of last 5 evals (ratio) | 1.356 / 1.857 (1.37) | `results/diagnostics/checkpoint_luck.csv` |
 | 110 | diagnostics a) checkpoint luck | own_cnn seed 43: best val MAE / median of last 5 evals (ratio) | 1.234 / 2.66 (2.16) | `results/diagnostics/checkpoint_luck.csv` |
 | 111 | diagnostics a) checkpoint luck | own_cnn seed 44: best val MAE / median of last 5 evals (ratio) | 1.027 / 1.163 (1.13) | `results/diagnostics/checkpoint_luck.csv` |
@@ -139,3 +139,18 @@ The diagnostics are post-hoc and val only; the offset correction is never applie
 | 130 | diagnostics c) own_cnn val MAE per blur | seed 42 | F1 1.332, F26 1.294, F39 1.354, F48 1.442 | `results/diagnostics/own_cnn_val_mae_by_blur.csv` |
 | 131 | diagnostics c) own_cnn val MAE per blur | seed 43 | F1 1.236, F26 1.28, F39 1.237, F48 1.182 | `results/diagnostics/own_cnn_val_mae_by_blur.csv` |
 | 132 | diagnostics c) own_cnn val MAE per blur | seed 44 | F1 1.024, F26 1.004, F39 1.029, F48 1.051 | `results/diagnostics/own_cnn_val_mae_by_blur.csv` |
+| 133 | ablation table (sec. 11.5) | own_cnn 256x192 (ablation): Wh / steps run / mWh per step | 0.873 / 1,500 / 0.582 | `runs/20261110-232222_train_own_cnn_a201/metrics.json` |
+| 134 | ablation table (sec. 11.5) | own_cnn depthwise-separable (ablation): Wh / steps run / mWh per step | 0.2904 / 1,650 / 0.176 | `runs/20261110-232352_train_own_cnn_ds_13c9/metrics.json` |
+| 135 | ablation table (sec. 11.5) | resnet18 AMP (efficiency run): Wh / steps run / mWh per step | 1.25 / 3,000 / 0.4168 | `runs/20261110-232429_train_resnet18_0845/metrics.json` |
+| 136 | ablation table (sec. 11.5) | resnet18 FP32 600-step noise reference: Wh / steps run / mWh per step | 0.3637 / 600 / 0.6061 | `runs/20261110-232634_train_resnet18_8658/metrics.json` |
+| 137 | savings: early stopping | own_cnn seed 42 128x96: steps run / not run / Wh saved / g CO2eq saved | 2,250 / 750 / 0.1464 / 0.068 | `results/savings.json` |
+| 138 | savings: early stopping | own_cnn seed 43 128x96: steps run / not run / Wh saved / g CO2eq saved | 1,950 / 1,050 / 0.1893 / 0.08796 | `results/savings.json` |
+| 139 | savings: early stopping | resnet18 seed 42 128x96: steps run / not run / Wh saved / g CO2eq saved | 1,800 / 1,200 / 0.7301 / 0.3392 | `results/savings.json` |
+| 140 | savings: early stopping | own_cnn seed 42 256x192: steps run / not run / Wh saved / g CO2eq saved | 1,500 / 1,500 / 0.873 / 0.4056 | `results/savings.json` |
+| 141 | savings: early stopping | own_cnn_ds seed 42 128x96: steps run / not run / Wh saved / g CO2eq saved | 1,650 / 1,350 / 0.2376 / 0.1104 | `results/savings.json` |
+| 142 | savings: early stopping | total (5 runs): steps not run / Wh saved / g CO2eq saved | 5,850 / 2.176 / 1.011 | `results/savings.json` |
+| 143 | savings: caching | decode + resize 1,200 train TIFs (128x96): s / Wh / g CO2eq (short_run) | 11.54 / 0.1283 / 0.05963 (yes) | `results/savings.json` |
+| 144 | savings: caching | load train cache (128x96): s / Wh / g CO2eq (short_run) | 0.1001 / 0.00747 / 0.00347 (yes) | `results/savings.json` |
+| 145 | savings: caching | own_cnn seed 42: steps run / batches per epoch / epochs / passes decoded | 2,250 / 37 / 60.81 / 61 | `results/savings.json` |
+| 146 | savings: caching | saving per training run if TIFs were decoded every epoch: Wh / g CO2eq / s | 7.822 / 3.634 / 703.7 | `results/savings.json` |
+| 147 | savings: caching | building the cache once (all splits, both resolutions): Wh / g CO2eq / s | 0.1311 / 0.0609 / 13.88 | `results/savings.json` |
