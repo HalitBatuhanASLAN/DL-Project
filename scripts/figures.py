@@ -18,7 +18,11 @@ Output (results/figures/, each as PNG at 300 dpi and as PDF):
 
 Main figure: final models are test_seen points (filled circles). Val-only variants have NO test
 number, so they are drawn with their best val MAE (open triangles, label "val MAE"). The Pareto
-front uses the test points only.
+front uses the plotted test points only. The mean baseline (MAE 25.85) is not drawn in either
+version (the title says so), so the y axis is linear. The project version shows the test points only.
+
+Figure labels: own_cnn is "KirazNet", own_cnn_ds is "KirazNet-Lite" (figures only; code, run
+folders and the label column of main_points.csv keep the old names).
 
 Run with the project virtual environment, after committing this script:
     .venv\\Scripts\\python.exe scripts\\figures.py
@@ -54,8 +58,12 @@ COLORS = {
     "mobilenet_v3_small": "#eb6834",
     "resnet18": "#1baf7a",
 }
-SHORT = {"mean": "mean", "brightness": "brightness", "own_cnn": "own_cnn",
+SHORT = {"mean": "mean", "brightness": "brightness", "own_cnn": "KirazNet",
          "mobilenet_v3_small": "mobilenet", "resnet18": "resnet18"}
+# Figure text for the label keys of main_points.csv (the keys stay unchanged).
+DISPLAY = {"own_cnn": "KirazNet", "own_cnn s43": "KirazNet s43", "own_cnn s44": "KirazNet s44",
+           "own_cnn 256x192": "KirazNet 256x192", "own_cnn depthwise": "KirazNet-Lite"}
+MEAN_NOTE = "mean baseline MAE 25.85, not shown"
 
 # The baselines are fitted by scripts/baselines.py; run 20261105-233219 wrote the current
 # brightness parameters and val predictions (commit b56eaaf). One run fits both baselines.
@@ -84,25 +92,18 @@ VARIANTS = [
 ]
 
 
-# Main-figure label positions (offset in points, alignment) where the default label collides.
-# Labels in the dense cluster go up into the empty space, on staggered rows, with a leader line.
-_COMMON_OFFSETS = {
-    "mean": (10, 3, "left"),
-    "brightness": (10, 3, "left"),
-    "own_cnn depthwise": (0, 22, "center"),
-    "own_cnn 256x192": (0, 35, "center"),
-    "mobilenet s43": (0, 55, "center"),
-    "mobilenet s44": (0, 75, "center"),
-    "mobilenet": (6, -10, "left"),
-}
+# Main-figure label positions (offset in points, alignment) where the default (right) label collides.
+# With a linear y axis the points spread out; mobilenet s43 sits next to resnet18 AMP (almost the
+# same MAE), so its label goes above the point, and the 256x192 label goes left, away from s43.
 LABEL_OFFSETS = {
-    "training": {**_COMMON_OFFSETS, "resnet18 AMP": (6, -12, "left")},
-    "project": {**_COMMON_OFFSETS, "resnet18 AMP": (0, 35, "center")},
+    "training": {"mobilenet s43": (0, 8, "center"), "own_cnn 256x192": (-7, -3, "right")},
+    "project": {},
 }
-VARIANT_X_NOTE = ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
-                  "that belong to it), in both versions.\n"
-                  "x of a baseline = the run that fitted it "
-                  "(training) or that run's model total plus all baseline-fit runs (project).")
+X_NOTES = {
+    "training": ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
+                 "that belong to it).\nx of brightness = the run that fitted it."),
+    "project": "x of brightness = that model's project total plus all baseline-fit runs.",
+}
 
 
 def read_json(path):
@@ -174,12 +175,15 @@ def pareto_front(points):
     return pd.DataFrame(front)
 
 
-def plot_main(points, x_column, x_label, name, version):
+def plot_main(points, x_column, x_label, name, version, title):
     data = points.assign(x=points[x_column])
+    data = data[data["family"] != "mean"]  # Not drawn: MEAN_NOTE in the title.
+    if version == "project":
+        data = data[data["kind"] == "test_seen MAE"]  # Test points only.
     test = data[data["kind"] == "test_seen MAE"]
     val = data[data["kind"] == "val MAE"]
 
-    fig, ax = plt.subplots(figsize=(7.5, 5))
+    fig, ax = plt.subplots(figsize=(7.5, 5.5))
     front = pareto_front(test)
     ax.step(front["x"], front["mae"], where="post", color="#0b0b0b", linestyle="--",
             linewidth=1, label="Pareto front (test points only)", zorder=1)
@@ -196,21 +200,20 @@ def plot_main(points, x_column, x_label, name, version):
 
     # Direct labels; val points say "val" in the label as well, so they cannot be misread.
     for _, p in data.iterrows():
-        text = p["label"] + (" (val)" if p["kind"] == "val MAE" else "")
+        text = DISPLAY.get(p["label"], p["label"]) + (" (val)" if p["kind"] == "val MAE" else "")
         dx, dy, ha = LABEL_OFFSETS[version].get(p["label"], (6, 3, "left"))
         leader = {"arrowstyle": "-", "color": "#c3c2b7", "linewidth": 0.6} if dy >= 20 else None
         ax.annotate(text, (p["x"], p["mae"]), xytext=(dx, dy), textcoords="offset points",
                     fontsize=7, color="#3d3d3a", ha=ha, arrowprops=leader)
 
-    ax.set_xscale("log")
-    ax.set_yscale("log")  # The mean baseline (25.85) is 15x the others; log keeps all readable.
+    ax.set_xscale("log")  # y stays linear: without the mean baseline all MAEs lie within 1-2 cells.
     # Ticks at 1, 2 and 5 times each power of 10, written as e.g. 2e-04.
     ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
     ax.xaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
     ax.xaxis.set_minor_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
     ax.set_xlabel(x_label)
-    ax.set_ylabel("MAE (cells), log scale")
-    ax.set_title("MAE vs CO2: test_seen for final models, val for variants", fontsize=10)
+    ax.set_ylabel("MAE (cells)")
+    ax.set_title(title, fontsize=10)
     style(ax)
     ax.grid(True, which="minor", color="#f0efea", linewidth=0.4)
 
@@ -221,12 +224,14 @@ def plot_main(points, x_column, x_label, name, version):
                markersize=11, label="on the Pareto front"),
         Line2D([], [], marker="o", linestyle="none", color="#0b0b0b", markersize=7,
                label="test_seen MAE (final model, seed 42)"),
-        Line2D([], [], marker="^", linestyle="none", markerfacecolor="none", markeredgecolor="#0b0b0b",
-               markersize=7, label="val MAE (val-only variant, no test run)"),
     ]
-    ax.legend(handles=handles, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2,
+    if len(val):
+        handles.append(Line2D([], [], marker="^", linestyle="none", markerfacecolor="none",
+                              markeredgecolor="#0b0b0b", markersize=7,
+                              label="val MAE (val-only variant, no test run)"))
+    ax.legend(handles=handles, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2,
               frameon=False)
-    fig.text(0.01, -0.12, VARIANT_X_NOTE, fontsize=6.5, color="#5f5e5a", va="top")
+    fig.text(0.01, -0.06, X_NOTES[version], fontsize=6.5, color="#5f5e5a", va="top")
     save(fig, name)
     return front
 
@@ -313,7 +318,7 @@ def plot_energy(results):
 
 
 def main():
-    config = {"task": "figures", "sets": "saved predictions and run folders only"}
+    config = {"task": "figures", "version": 2, "sets": "saved predictions and run folders only"}
     with tracked_run("analysis", "all_final", config, notes="report figures") as run_dir:
         FIG_DIR.mkdir(parents=True, exist_ok=True)
         results = pd.read_csv(RESULTS_DIR / "results.csv")
@@ -324,9 +329,11 @@ def main():
         points.to_csv(FIG_DIR / "main_points.csv", index=False, lineterminator="\n", float_format="%.6g")
         fronts = {
             "training": plot_main(points, "x_train_kg", "kg CO2eq, training incl. LR search (log scale)",
-                                  "mae_vs_co2_training", "training"),
+                                  "mae_vs_co2_training", "training",
+                                  f"MAE vs CO2 (training): test_seen for final models, val for variants\n({MEAN_NOTE})"),
             "project": plot_main(points, "x_project_kg", "kg CO2eq, project total per model (log scale)",
-                                 "mae_vs_co2_project", "project"),
+                                 "mae_vs_co2_project", "project",
+                                 f"MAE vs CO2 (project total): test_seen, final models\n({MEAN_NOTE})"),
         }
         plot_val_curves(baseline_val)
         plot_blur(pd.read_csv(RESULTS_DIR / "test_mae_by_blur.csv"))
