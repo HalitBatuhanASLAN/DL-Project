@@ -2,6 +2,7 @@
 
 All on val images, category measure. Every prediction starts from the cached uint8 image, so the
 normalisation of the CNNs and the mean pixel of the brightness baseline are both counted.
+The mean baseline "predicts" by returning the train mean, so it measures the loop and the machine.
 
 Latency (CPU for every model, GPU for the CNNs): eval mode, no_grad, batch size 1, 200 warm-up
 passes, then 5 repeats of 1,000 timed passes. Reported: median and p95.
@@ -12,7 +13,7 @@ Energy per 1,000 predictions (CPU for every model, GPU for the CNNs): a 60 s idl
     net   = (energy of the repeat - idle power * duration of the repeat) / predictions * 1000
 The energy ratio in the report uses CPU gross.
 
-One model per call takes about 8 minutes for a CNN and 4 minutes for brightness.
+One model per call takes about 8 minutes for a CNN and 4 minutes for a baseline.
 
 Output: results/measure/<model>.json
 
@@ -43,6 +44,8 @@ LATENCY = RULES["measurement"]["latency"]
 ENERGY = RULES["measurement"]["energy_per_1000"]
 OUT_DIR = RESULTS_DIR / "measure"
 BRIGHTNESS_JSON = RESULTS_DIR / "baselines" / "brightness_params.json"
+BASELINES_JSON = RESULTS_DIR / "baselines_val.json"  # Holds the train mean (50.05).
+BASELINES = ["mean", "brightness"]
 CPU_THREADS = 4  # Fixed for every model (section 11.7).
 KWH_PER_KW_SECOND = 1 / 3600
 
@@ -61,6 +64,9 @@ def load_val_images(resolution, device):
 
 def make_predictor(name, checkpoint_path, resolution, device):
     """Return a function that turns one uint8 image into one prediction."""
+    if name == "mean":
+        train_mean = json.loads(BASELINES_JSON.read_text(encoding="utf-8"))["train_mean"]
+        return lambda image: train_mean  # Same answer for every image (section 7).
     if name == "brightness":
         params = json.loads(BRIGHTNESS_JSON.read_text(encoding="utf-8"))
         return lambda image: params["a"] + params["b"] * image.float().mean()
@@ -158,16 +164,16 @@ def energy_repeat(name, checkpoint, resolution, device, repeat, idle_kw):
 
 def main():
     parser = argparse.ArgumentParser(description="Latency and energy of one model (section 11.7).")
-    parser.add_argument("--model", required=True, choices=ALL_MODELS + ["brightness"])
+    parser.add_argument("--model", required=True, choices=ALL_MODELS + BASELINES)
     parser.add_argument("--checkpoint", help="required for a CNN")
     parser.add_argument("--resolution", default=load_decision("resolution.json")["main_resolution"])
     args = parser.parse_args()
-    if args.model != "brightness" and not args.checkpoint:
+    if args.model not in BASELINES and not args.checkpoint:
         raise SystemExit("A CNN needs --checkpoint.")
 
     torch.set_num_threads(CPU_THREADS)
     devices = [torch.device("cpu")]
-    if args.model != "brightness":
+    if args.model not in BASELINES:  # GPU only for the CNNs (section 11.7).
         devices.append(torch.device("cuda"))
 
     result = {
