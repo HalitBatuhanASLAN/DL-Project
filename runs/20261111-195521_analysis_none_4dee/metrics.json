@@ -1,0 +1,11 @@
+{
+  "timed_s": 11.454543600000761,
+  "images": 1200,
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 11.538402599999245,
+  "energy_kwh": 0.0001283472521693383,
+  "emissions_kg": 5.96283364963442e-05,
+  "short_run": true
+}

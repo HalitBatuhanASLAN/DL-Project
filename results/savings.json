@@ -1,0 +1,113 @@
+{
+  "early_stopping": {
+    "budget_steps": 3000,
+    "energy_per_step": "run energy / steps_run (includes start-up and val evaluations)",
+    "runs": [
+      {
+        "run_id": "20261110-231256_train_own_cnn_73cc",
+        "model": "own_cnn",
+        "seed": 42,
+        "resolution": "128x96",
+        "amp": false,
+        "steps_run": 2250,
+        "steps_not_run": 750,
+        "run_wh": 0.43907691907719026,
+        "mwh_per_step": 0.1951452973676401,
+        "wh_saved": 0.1463589730257301,
+        "g_co2eq_saved": 0.06799632984213184
+      },
+      {
+        "run_id": "20261110-231341_train_own_cnn_be25",
+        "model": "own_cnn",
+        "seed": 43,
+        "resolution": "128x96",
+        "amp": false,
+        "steps_run": 1950,
+        "steps_not_run": 1050,
+        "run_wh": 0.35160939073291186,
+        "mwh_per_step": 0.18031250806815993,
+        "wh_saved": 0.18932813347156793,
+        "g_co2eq_saved": 0.08795920021702185
+      },
+      {
+        "run_id": "20261110-232008_train_resnet18_c1c4",
+        "model": "resnet18",
+        "seed": 42,
+        "resolution": "128x96",
+        "amp": false,
+        "steps_run": 1800,
+        "steps_not_run": 1200,
+        "run_wh": 1.0950777434987264,
+        "mwh_per_step": 0.6083765241659591,
+        "wh_saved": 0.7300518289991509,
+        "g_co2eq_saved": 0.33917185902739955
+      },
+      {
+        "run_id": "20261110-232222_train_own_cnn_a201",
+        "model": "own_cnn",
+        "seed": 42,
+        "resolution": "256x192",
+        "amp": false,
+        "steps_run": 1500,
+        "steps_not_run": 1500,
+        "run_wh": 0.8730470206739007,
+        "mwh_per_step": 0.5820313471159337,
+        "wh_saved": 0.8730470206739006,
+        "g_co2eq_saved": 0.4056054231468048
+      },
+      {
+        "run_id": "20261110-232352_train_own_cnn_ds_13c9",
+        "model": "own_cnn_ds",
+        "seed": 42,
+        "resolution": "128x96",
+        "amp": false,
+        "steps_run": 1650,
+        "steps_not_run": 1350,
+        "run_wh": 0.2903622440333461,
+        "mwh_per_step": 0.17597711759596732,
+        "wh_saved": 0.2375691087545559,
+        "g_co2eq_saved": 0.11037128195984411
+      }
+    ],
+    "total_steps_not_run": 5850,
+    "total_wh_saved": 2.176355064924905,
+    "total_g_co2eq_saved": 1.0111040941932021
+  },
+  "caching": {
+    "resolution": "128x96",
+    "tif_decode": {
+      "run_id": "20261111-195521_analysis_none_4dee",
+      "duration_s": 11.538402599999245,
+      "energy_wh": 0.1283472521693383,
+      "g_co2eq": 0.0596283364963442,
+      "short_run": true,
+      "timed_s": 11.454543600000761
+    },
+    "cache_load": {
+      "run_id": "20261111-195537_analysis_none_3016",
+      "duration_s": 0.10006350000185193,
+      "energy_wh": 0.007469683540997594,
+      "g_co2eq": 0.0034703103975779084,
+      "short_run": true,
+      "timed_s": 0.08721109999896726
+    },
+    "epoch_source_run": "20261110-231256_train_own_cnn_73cc",
+    "steps_run": 2250,
+    "batches_per_epoch": 37,
+    "epochs": 60.810810810810814,
+    "passes_decoded": 61,
+    "decode_every_epoch_wh": 7.829182382329636,
+    "decode_every_epoch_s": 703.8425585999539,
+    "saving_per_training_run_wh": 7.821712698788638,
+    "saving_per_training_run_g_co2eq": 3.6338582158794184,
+    "saving_per_training_run_s": 703.7424950999521,
+    "build_cache_once": {
+      "run_id": "20261105-225640_preprocess_none_851d",
+      "wh": 0.13108803389399537,
+      "g_co2eq": 0.06090166531467573,
+      "duration_s": 13.884710100013763,
+      "note": "all 4 splits, both resolutions, one time"
+    },
+    "note": "short_run = energy below measurement resolution (section 10); an estimate"
+  }
+}
