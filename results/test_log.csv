@@ -1,0 +1,6 @@
+time,label,attempt,forced,reason,run_id,checkpoint
+2026-11-11T19:04:11,mean_128x96,1,False,,20261111-190407_eval_mean_79ed,
+2026-11-11T19:04:30,brightness_128x96,1,False,,20261111-190426_eval_brightness_805e,
+2026-11-11T19:04:49,own_cnn_128x96,1,False,,20261111-190445_eval_own_cnn_1cc4,checkpoints/20261110-231256_train_own_cnn_73cc.pt
+2026-11-11T19:05:07,mobilenet_v3_small_128x96,1,False,,20261111-190503_eval_mobilenet_v3_small_6765,checkpoints/20261110-231518_train_mobilenet_v3_small_c673.pt
+2026-11-11T19:05:26,resnet18_128x96,1,False,,20261111-190521_eval_resnet18_233f,checkpoints/20261110-232008_train_resnet18_c1c4.pt
