@@ -104,9 +104,10 @@ def speed_and_energy(model):
     """Latency in ms and energy per 1,000 predictions in Wh, from results/measure/<model>.json."""
     measured = json.loads((MEASURE_DIR / f"{model}.json").read_text(encoding="utf-8"))
     result = {}
-    for device in ["gpu", "cpu"]:
-        latency = measured["latency"].get(device)  # Baselines have no GPU entry.
-        energy = measured["energy"].get(device)
+    # measure.py names the GPU by torch's device type, "cuda".
+    for device, key in [("gpu", "cuda"), ("cpu", "cpu")]:
+        latency = measured["latency"].get(key)  # Baselines have no GPU entry.
+        energy = measured["energy"].get(key)
         result[f"{device}_ms_median"] = latency["median_ms"] if latency else np.nan
         result[f"{device}_ms_p95"] = latency["p95_ms"] if latency else np.nan
         result[f"{device}_gross_wh_per_1000"] = energy["median_gross_kwh_per_1000"] * 1000 if energy else np.nan
