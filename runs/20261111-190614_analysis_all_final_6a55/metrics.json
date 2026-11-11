@@ -1,0 +1,135 @@
+{
+  "rules_version": "rules-v2.1",
+  "resolution": "128x96",
+  "acceptance": {
+    "mae_own": 1.5692445362499998,
+    "mae_best": 1.2489673567500004,
+    "best_standard_model": "mobilenet_v3_small",
+    "mae_mean": 25.850000000000005,
+    "limit_best": 1.4363124602625004,
+    "limit_mean": 15.510000000000002,
+    "ratio_own_over_best": {
+      "point": 1.256433587130258,
+      "low": 1.065341065349391,
+      "high": 1.4862405905538891
+    },
+    "ratio_own_over_mean": 0.060705784767891666,
+    "pass_best": false,
+    "pass_mean": true,
+    "pass": false
+  },
+  "beats_brightness": {
+    "own_cnn": {
+      "ratio_mae_over_brightness": {
+        "point": 1.373605230878341,
+        "low": 1.2158405950606739,
+        "high": 1.557707293435021
+      },
+      "beats_brightness": false,
+      "energy_ratio_cpu_gross": 59.48619351159031,
+      "test_unseen_ratio_diagnostic": {
+        "point": 1.190920747185543,
+        "low": 1.0300945639250219,
+        "high": 1.3729588323795217
+      }
+    },
+    "mobilenet_v3_small": {
+      "ratio_mae_over_brightness": {
+        "point": 1.0932573316634326,
+        "low": 0.9266006443449047,
+        "high": 1.2909169345234466
+      },
+      "beats_brightness": false,
+      "energy_ratio_cpu_gross": 242.28848668214727,
+      "test_unseen_ratio_diagnostic": {
+        "point": 1.3191386640081169,
+        "low": 1.1239841145869731,
+        "high": 1.5503311596101206
+      }
+    },
+    "resnet18": {
+      "ratio_mae_over_brightness": {
+        "point": 1.708103566537176,
+        "low": 1.410327057422337,
+        "high": 2.0850826797890822
+      },
+      "beats_brightness": false,
+      "energy_ratio_cpu_gross": 411.5471546066472,
+      "test_unseen_ratio_diagnostic": {
+        "point": 1.8539305481517858,
+        "low": 1.571949709112285,
+        "high": 2.2154062316307455
+      }
+    }
+  },
+  "test_unseen": {
+    "mean": {
+      "test_unseen_mae": 25.75,
+      "test_unseen_mae_low": 23.150750000000002,
+      "test_unseen_mae_high": 28.310124999999996,
+      "test_unseen_rmse": 28.861349587294075,
+      "test_unseen_rmse_low": 26.45223147463034,
+      "test_unseen_rmse_high": 31.051496743166407,
+      "test_unseen_r2": -0.008829006131254147,
+      "test_unseen_r2_low": -0.08639093297292419,
+      "test_unseen_r2_high": -2.0992391065671746e-05
+    },
+    "brightness": {
+      "test_unseen_mae": 1.1472700141709196,
+      "test_unseen_mae_low": 0.978776076029734,
+      "test_unseen_mae_high": 1.3224282375094423,
+      "test_unseen_rmse": 1.5179734717380935,
+      "test_unseen_rmse_low": 1.287742925292297,
+      "test_unseen_rmse_high": 1.7469600463646786,
+      "test_unseen_r2": 0.9972093032038143,
+      "test_unseen_r2_low": 0.9962193163051928,
+      "test_unseen_r2_high": 0.9979575980383406
+    },
+    "own_cnn": {
+      "test_unseen_mae": 1.3663076625,
+      "test_unseen_mae_low": 1.1744157706874998,
+      "test_unseen_mae_high": 1.568753077875,
+      "test_unseen_rmse": 1.739291112027457,
+      "test_unseen_rmse_low": 1.5008480342363855,
+      "test_unseen_rmse_high": 1.9708782008763537,
+      "test_unseen_r2": 0.9963362245736096,
+      "test_unseen_r2_low": 0.9950892235036917,
+      "test_unseen_r2_high": 0.9972692636888535
+    },
+    "mobilenet_v3_small": {
+      "test_unseen_mae": 1.51340823375,
+      "test_unseen_mae_low": 1.2573702120937504,
+      "test_unseen_mae_high": 1.7878620619687504,
+      "test_unseen_rmse": 2.0615269961268607,
+      "test_unseen_rmse_low": 1.7302666233128647,
+      "test_unseen_rmse_high": 2.379677208504427,
+      "test_unseen_r2": 0.9948529031192069,
+      "test_unseen_r2_low": 0.9929025474843456,
+      "test_unseen_r2_high": 0.9963595990067636
+    },
+    "resnet18": {
+      "test_unseen_mae": 2.12695892625,
+      "test_unseen_mae_low": 1.8343857312499998,
+      "test_unseen_mae_high": 2.43042506603125,
+      "test_unseen_rmse": 2.704475532126914,
+      "test_unseen_rmse_low": 2.3783690625814007,
+      "test_unseen_rmse_high": 3.0321014224041822,
+      "test_unseen_r2": 0.9911416996092672,
+      "test_unseen_r2_low": 0.9877671153277924,
+      "test_unseen_r2_high": 0.9934831709274815
+    }
+  },
+  "project_total": {
+    "runs": 102,
+    "energy_kwh": 0.03228797224182238,
+    "emissions_kg": 0.015000531973977287,
+    "note": "runs/index.csv before this analysis run"
+  },
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 15.322117499999877,
+  "energy_kwh": 0.0001653226398394456,
+  "emissions_kg": 7.680658395244866e-05,
+  "short_run": false
+}
