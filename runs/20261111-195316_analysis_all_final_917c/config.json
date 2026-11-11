@@ -1,0 +1,19 @@
+{
+  "args": {
+    "task": "figures",
+    "version": 2,
+    "sets": "saved predictions and run folders only"
+  },
+  "seed": null,
+  "command": [
+    "scripts/figures.py"
+  ],
+  "git_commit": "f87544f7acf1e6dee348458268fb1f2a93caf286",
+  "rules_sha256": "2f288c019867a7f6382948e0b78b89fe6da0117f14b3f7d39ae302a3a4e682d3",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}
