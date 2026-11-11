@@ -60,7 +60,9 @@ COLORS = {
 }
 SHORT = {"mean": "mean", "brightness": "brightness", "own_cnn": "KirazNet",
          "mobilenet_v3_small": "mobilenet", "resnet18": "resnet18"}
-# Figure text for the label keys of main_points.csv (the keys stay unchanged).
+# Label keys of main_points.csv (unchanged from v1) and the figure text for them.
+KEY = {"mean": "mean", "brightness": "brightness", "own_cnn": "own_cnn",
+       "mobilenet_v3_small": "mobilenet", "resnet18": "resnet18"}
 DISPLAY = {"own_cnn": "KirazNet", "own_cnn s43": "KirazNet s43", "own_cnn s44": "KirazNet s44",
            "own_cnn 256x192": "KirazNet 256x192", "own_cnn depthwise": "KirazNet-Lite"}
 MEAN_NOTE = "mean baseline MAE 25.85, not shown"
@@ -96,8 +98,9 @@ VARIANTS = [
 # With a linear y axis the points spread out; mobilenet s43 sits next to resnet18 AMP (almost the
 # same MAE), so its label goes above the point, and the 256x192 label goes left, away from s43.
 LABEL_OFFSETS = {
-    "training": {"mobilenet s43": (0, 8, "center"), "own_cnn 256x192": (-7, -3, "right")},
-    "project": {},
+    "training": {"brightness": (10, 3, "left"), "mobilenet s43": (0, 8, "center"),
+                 "own_cnn 256x192": (-7, -3, "right")},
+    "project": {"brightness": (10, 3, "left")},
 }
 X_NOTES = {
     "training": ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
@@ -145,7 +148,7 @@ def main_points(results, index):
             x_train = emissions[BASELINE_FIT_RUN]
             x_project = r["project_kg_co2eq"] + baseline_runs_kg
             source = f"runs/index.csv ({BASELINE_FIT_RUN}; project = results.csv + all mean_and_brightness runs)"
-        rows.append({"label": SHORT[model], "family": model, "kind": "test_seen MAE",
+        rows.append({"label": KEY[model], "family": model, "kind": "test_seen MAE",
                      "mae": r["test_seen_mae"], "x_train_kg": x_train, "x_project_kg": x_project,
                      "mae_source": "results/results.csv (test_seen_mae)", "x_source": source})
 
@@ -207,10 +210,10 @@ def plot_main(points, x_column, x_label, name, version, title):
                     fontsize=7, color="#3d3d3a", ha=ha, arrowprops=leader)
 
     ax.set_xscale("log")  # y stays linear: without the mean baseline all MAEs lie within 1-2 cells.
-    # Ticks at 1, 2 and 5 times each power of 10, written as e.g. 2e-04.
+    # Ticks at 1, 2 and 5 times each power of 10 (more if the range is under one decade), as e.g. 2.0e-04.
     ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
-    ax.xaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
-    ax.xaxis.set_minor_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.1e}"))
+    ax.xaxis.set_minor_formatter(FuncFormatter(lambda value, _: f"{value:.1e}"))
     ax.set_xlabel(x_label)
     ax.set_ylabel("MAE (cells)")
     ax.set_title(title, fontsize=10)
