@@ -1,0 +1,10 @@
+{
+  "n_predictions": 4026,
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 60.159792300000845,
+  "energy_kwh": 0.0005764701464096804,
+  "emissions_kg": 0.0002678199594398878,
+  "short_run": false
+}

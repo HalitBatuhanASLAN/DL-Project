@@ -1,0 +1,108 @@
+{
+  "rules_version": "rules-v2.1",
+  "model": "mobilenet_v3_small",
+  "resolution": "128x96",
+  "checkpoint": "checkpoints/20261110-231518_train_mobilenet_v3_small_c673.pt",
+  "cpu_threads": 4,
+  "idle_kw": 0.028213707418268525,
+  "latency": {
+    "cpu": {
+      "median_ms_per_repeat": [
+        8.279650000986294,
+        8.333149999089073,
+        8.318799998960458,
+        8.436199999778182,
+        8.37859999955981
+      ],
+      "p95_ms_per_repeat": [
+        9.587940001438255,
+        9.709584998927312,
+        9.527435002200944,
+        9.68899500076077,
+        9.56692000017938
+      ],
+      "median_ms": 8.333149999089073,
+      "p95_ms": 9.587940001438255
+    },
+    "cuda": {
+      "median_ms_per_repeat": [
+        6.394500000169501,
+        6.112950000897399,
+        6.000149998726556,
+        5.978649998723995,
+        5.89034999939031
+      ],
+      "p95_ms_per_repeat": [
+        8.689900002354987,
+        7.5492949996259995,
+        7.344550000016169,
+        7.435484998859465,
+        7.200559999728283
+      ],
+      "median_ms": 6.000149998726556,
+      "p95_ms": 7.435484998859465
+    }
+  },
+  "energy": {
+    "cpu": {
+      "repeats": [
+        {
+          "run_id": "20261111-184743_measure_mobilenet_v3_small_29a2",
+          "n_predictions": 7080,
+          "duration_s": 60.061492400000134,
+          "energy_kwh": 0.0005930189890116539,
+          "gross_kwh_per_1000": 8.375974421068557e-05,
+          "net_kwh_per_1000": 1.7275227038755163e-05
+        },
+        {
+          "run_id": "20261111-184846_measure_mobilenet_v3_small_1b51",
+          "n_predictions": 7129,
+          "duration_s": 60.068587599998864,
+          "energy_kwh": 0.0005914285067157849,
+          "gross_kwh_per_1000": 8.296093515440944e-05,
+          "net_kwh_per_1000": 1.6925588309168523e-05
+        },
+        {
+          "run_id": "20261111-184948_measure_mobilenet_v3_small_5c92",
+          "n_predictions": 7023,
+          "duration_s": 60.06352589999733,
+          "energy_kwh": 0.0005878017541403189,
+          "gross_kwh_per_1000": 8.369667579956127e-05,
+          "net_kwh_per_1000": 1.6670288443251127e-05
+        }
+      ],
+      "median_gross_kwh_per_1000": 8.369667579956127e-05,
+      "median_net_kwh_per_1000": 1.6925588309168523e-05
+    },
+    "cuda": {
+      "repeats": [
+        {
+          "run_id": "20261111-185127_measure_mobilenet_v3_small_a0dc",
+          "n_predictions": 9353,
+          "duration_s": 60.13407150000057,
+          "energy_kwh": 0.0005580548844963644,
+          "gross_kwh_per_1000": 5.966587025514427e-05,
+          "net_kwh_per_1000": 9.27784564122788e-06
+        },
+        {
+          "run_id": "20261111-185229_measure_mobilenet_v3_small_0b50",
+          "n_predictions": 8833,
+          "duration_s": 60.11641320000126,
+          "energy_kwh": 0.0005634778939245509,
+          "gross_kwh_per_1000": 6.379235751438366e-05,
+          "net_kwh_per_1000": 1.0453649982634935e-05
+        },
+        {
+          "run_id": "20261111-185332_measure_mobilenet_v3_small_0bbc",
+          "n_predictions": 9661,
+          "duration_s": 60.12431210000068,
+          "energy_kwh": 0.0005611813218525533,
+          "gross_kwh_per_1000": 5.8087291362442116e-05,
+          "net_kwh_per_1000": 9.313592115927455e-06
+        }
+      ],
+      "median_gross_kwh_per_1000": 5.966587025514427e-05,
+      "median_net_kwh_per_1000": 9.313592115927455e-06
+    }
+  }
+}

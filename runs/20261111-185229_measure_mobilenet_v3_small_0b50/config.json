@@ -1,0 +1,25 @@
+{
+  "args": {
+    "task": "energy",
+    "device": "cuda",
+    "threads": 4,
+    "resolution": "128x96",
+    "repeat": 2
+  },
+  "seed": null,
+  "command": [
+    "scripts/measure.py",
+    "--model",
+    "mobilenet_v3_small",
+    "--checkpoint",
+    "checkpoints/20261110-231518_train_mobilenet_v3_small_c673.pt"
+  ],
+  "git_commit": "8bd4a07856bebbf17b1fd806bf736c269d5d0463",
+  "rules_sha256": "2f288c019867a7f6382948e0b78b89fe6da0117f14b3f7d39ae302a3a4e682d3",
+  "splits_sha256": "43fee5789616aa731391b037575ed58695cdcc80cab4aa19bdf73f6b400a3690",
+  "torch_version": "2.6.0+cu124",
+  "cuda_version": "12.4",
+  "codecarbon_version": "3.3.2",
+  "gpu_name": "NVIDIA GeForce RTX 3050 Ti Laptop GPU",
+  "power_source": "AC"
+}
