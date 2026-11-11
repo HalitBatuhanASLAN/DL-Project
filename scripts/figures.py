@@ -33,6 +33,8 @@ import matplotlib
 matplotlib.use("Agg")  # Draw to files only, no window.
 import matplotlib.pyplot as plt  # noqa: E402
 import pandas as pd  # noqa: E402
+from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.ticker import FuncFormatter, LogLocator  # noqa: E402
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))  # Lets Python find the src package.
@@ -80,6 +82,20 @@ VARIANTS = [
     ("own_cnn depthwise", "own_cnn", "20261110-232352_train_own_cnn_ds_13c9", {"model": "own_cnn_ds"}),
     ("resnet18 AMP", "resnet18", "20261110-232429_train_resnet18_0845", {"amp": True, "max_steps": 3000}),
 ]
+
+
+# Main-figure label positions (offset in points, alignment) where the default label collides.
+LABEL_OFFSETS = {
+    "own_cnn depthwise": (-6, 3, "right"),
+    "own_cnn 256x192": (6, -10, "left"),
+    "mobilenet s43": (-6, 6, "right"),
+    "mobilenet": (6, -10, "left"),
+    "resnet18 AMP": (6, -10, "left"),
+}
+VARIANT_X_NOTE = ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
+                  "that belong to it), in both versions.
+x of a baseline = the run that fitted it "
+                  "(training) or that run's model total plus all baseline-fit runs (project).")
 
 
 def read_json(path):
@@ -167,20 +183,42 @@ def plot_main(points, x_column, x_label, name):
                edgecolors=[COLORS[f] for f in val["family"]], zorder=3,
                label="val MAE (val-only variant, no test run)")
 
+    # Points on the Pareto front get a black ring, so a front of one point is still visible.
+    ax.scatter(front["x"], front["mae"], s=180, facecolors="none", edgecolors="#0b0b0b",
+               linewidths=1, zorder=2)
+
     # Direct labels; val points say "val" in the label as well, so they cannot be misread.
     for _, p in data.iterrows():
         text = p["label"] + (" (val)" if p["kind"] == "val MAE" else "")
-        ax.annotate(text, (p["x"], p["mae"]), xytext=(6, 3), textcoords="offset points",
-                    fontsize=7, color="#3d3d3a")
+        dx, dy, ha = LABEL_OFFSETS.get(p["label"], (6, 3, "left"))
+        ax.annotate(text, (p["x"], p["mae"]), xytext=(dx, dy), textcoords="offset points",
+                    fontsize=7, color="#3d3d3a", ha=ha)
 
     ax.set_xscale("log")
     ax.set_yscale("log")  # The mean baseline (25.85) is 15x the others; log keeps all readable.
+    # Ticks at 1, 2 and 5 times each power of 10, written as e.g. 2e-04.
+    ax.xaxis.set_minor_locator(LogLocator(base=10, subs=(2, 5)))
+    ax.xaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
+    ax.xaxis.set_minor_formatter(FuncFormatter(lambda value, _: f"{value:.0e}"))
     ax.set_xlabel(x_label)
     ax.set_ylabel("MAE (cells), log scale")
     ax.set_title("MAE vs CO2: test_seen for final models, val for variants", fontsize=10)
     style(ax)
     ax.grid(True, which="minor", color="#f0efea", linewidth=0.4)
-    ax.legend(fontsize=7, loc="upper right", frameon=False)
+
+    # Legend with neutral (black) proxy markers: the shape says test or val, the colour says model.
+    handles = [
+        Line2D([], [], color="#0b0b0b", linestyle="--", linewidth=1, label="Pareto front (test points only)"),
+        Line2D([], [], marker="o", linestyle="none", markerfacecolor="none", markeredgecolor="#0b0b0b",
+               markersize=11, label="on the Pareto front"),
+        Line2D([], [], marker="o", linestyle="none", color="#0b0b0b", markersize=7,
+               label="test_seen MAE (final model, seed 42)"),
+        Line2D([], [], marker="^", linestyle="none", markerfacecolor="none", markeredgecolor="#0b0b0b",
+               markersize=7, label="val MAE (val-only variant, no test run)"),
+    ]
+    ax.legend(handles=handles, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=2,
+              frameon=False)
+    fig.text(0.01, -0.12, VARIANT_X_NOTE, fontsize=6.5, color="#5f5e5a", va="top")
     save(fig, name)
     return front
 
