@@ -22,19 +22,19 @@ The prompt and the session log of a session have the same file name in `prompts/
 
 | Session | Topic | Tag(s) | Transcript |
 | --- | --- | --- | --- |
-| `2026-11-05_01_data_inventory` | BBBC005 extraction and data inventory | - | yes (snapshot to 20:45, see below) |
-| `2026-11-05_02_rules_carbon_split` | Rules freeze, CodeCarbon helper, frozen split | `rules-v1`, `split-v1` | no |
-| `2026-11-05_03_housekeeping_visual_checks` | Stain, resolution and blur checks | `data-v1` | no |
-| `2026-11-05_04_rules_v1_1` | Check 2 at nucleus scale | `rules-v1.1`, `data-v2` | no |
-| `2026-11-05_05_cache_baselines` | Image cache, mean and brightness baselines | `cache-v1` | no |
-| `2026-11-05_06_rules_v2` | Training rules frozen before any training | `rules-v2` | no |
-| `2026-11-05_06_training_infra` | Models, train/search/test/measure code, weights, smoke tests | `infra-v1` | no |
-| `2026-11-10_01_rules_v2_1_and_lr_search` | Zero-init head, init and reproducibility checks, LR search | `rules-v2.1`, `infra-v1.1`, `search-v1` | no |
-| `2026-11-10_02_final_training` | Final training (7 runs), ablations, BN diagnostic | `train-v1`, `ablation-v1` | no |
-| `2026-11-10_03_measure_and_test` | Latency/energy measurement, one test run per model, results | `test-v1` | no |
-| `2026-11-11_01_figures_and_diagnostics` | Report figures, own_cnn val diagnostics, summary table | `analysis-v1` | no |
-| `2026-11-11_02_figures_v2_and_savings` | KirazNet labels, early-stopping and cache savings | `analysis-v2` | no |
-| `2026-11-11_03_repo_docs` | Report sources moved to `report/`, README, this index | - | no (session log only) |
+| `2026-11-05_01_data_inventory` | BBBC005 extraction and data inventory | - | yes |
+| `2026-11-05_02_rules_carbon_split` | Rules freeze, CodeCarbon helper, frozen split | `rules-v1`, `split-v1` | yes |
+| `2026-11-05_03_housekeeping_visual_checks` | Stain, resolution and blur checks | `data-v1` | yes |
+| `2026-11-05_04_rules_v1_1` | Check 2 at nucleus scale | `rules-v1.1`, `data-v2` | yes |
+| `2026-11-05_05_cache_baselines` | Image cache, mean and brightness baselines | `cache-v1` | yes |
+| `2026-11-05_06_rules_v2` | Training rules frozen before any training | `rules-v2` | yes |
+| `2026-11-05_06_training_infra` | Models, train/search/test/measure code, weights, smoke tests | `infra-v1` | yes |
+| `2026-11-10_01_rules_v2_1_and_lr_search` | Zero-init head, init and reproducibility checks, LR search | `rules-v2.1`, `infra-v1.1`, `search-v1` | yes |
+| `2026-11-10_02_final_training` | Final training (7 runs), ablations, BN diagnostic | `train-v1`, `ablation-v1` | yes |
+| `2026-11-10_03_measure_and_test` | Latency/energy measurement, one test run per model, results | `test-v1` | yes |
+| `2026-11-11_01_figures_and_diagnostics` | Report figures, own_cnn val diagnostics, summary table | `analysis-v1` | yes |
+| `2026-11-11_02_figures_v2_and_savings` | KirazNet labels, early-stopping and cache savings | `analysis-v2` | yes |
+| `2026-11-11_03_repo_docs` | Report sources moved to `report/`, README, this index | - | later (this session's file was still being written) |
 
 ## Not in this folder
 
@@ -45,8 +45,10 @@ The prompt and the session log of a session have the same file name in `prompts/
 
 ## Transcript status
 
-Only `transcripts/2026-11-05_01_data_inventory.md` exists so far. It was made from a copy of the raw file
-taken at 20:45:30 on 2026-11-05, so it stops partway through the logging task at the end of that session.
-The complete raw files of all code sessions are stored by Claude Code outside the repository. The masked
-transcripts of the other sessions still need to be generated from them (see
-`sessions/2026-11-11_03_repo_docs.md`).
+One masked transcript per code session, named like the session log. Each was generated from the
+complete raw `.jsonl` of its Claude Code session (10 files, see each transcript's header for the session
+id). Two raw files each held two tasks, so they were split at the user message that starts the second task:
+`6275d8b5` (sessions 03 and 04) and `3ae4126e` (sessions 05 and 06_rules_v2). Background task notifications
+(monitors of long training or measurement runs) are shown as short excerpts. The masking is the same as in the
+first transcript, plus three rules added on 2026-11-11 (author e-mail, and two pieces of masking-rule text
+that named another project's folder and ID pattern).
