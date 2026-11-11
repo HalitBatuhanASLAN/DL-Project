@@ -93,8 +93,8 @@ LABEL_OFFSETS = {
     "resnet18 AMP": (6, -10, "left"),
 }
 VARIANT_X_NOTE = ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
-                  "that belong to it), in both versions.
-x of a baseline = the run that fitted it "
+                  "that belong to it), in both versions.\n"
+                  "x of a baseline = the run that fitted it "
                   "(training) or that run's model total plus all baseline-fit runs (project).")
 
 
