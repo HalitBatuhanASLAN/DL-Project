@@ -8,6 +8,7 @@ Reads only files that already exist; it opens NO image and NO test file (section
     results/figures/main_points.csv                     points of the main figure (scripts/figures.py)
     results/test_mae_by_blur.csv                        test_seen MAE per blur level
     runs/index.csv                                      project total
+    results/savings.json                                early-stopping and caching savings (scripts/savings.py)
 
 Every value is copied by code from its file, so no number is typed by hand.
 
@@ -212,6 +213,39 @@ def diagnostic_rows():
             folder + "own_cnn_val_mae_by_blur.csv")
 
 
+def ablation_rows():
+    """Energy of the ablation and efficiency runs (section 11.5), the source of the report's ablation table."""
+    for label, run_id in TRAINING_RUNS[7:11]:
+        m = read_json(RUNS_DIR / run_id / "metrics.json")
+        add("ablation table (sec. 11.5)", f"{label}: Wh / steps run / mWh per step",
+            f"{fmt(m['energy_kwh'] * 1000)} / {fmt(m['steps_run'])} / {fmt(m['energy_kwh'] * 1e6 / m['steps_run'])}",
+            f"runs/{run_id}/metrics.json")
+
+
+def savings_rows():
+    """Early stopping and caching (section 11.5, reported without extra training)."""
+    src = "results/savings.json"
+    s = read_json(RESULTS_DIR / "savings.json")
+    e = s["early_stopping"]
+    for r in e["runs"]:
+        add("savings: early stopping", f"{r['model']} seed {r['seed']} {r['resolution']}: steps run / not run / Wh saved / g CO2eq saved",
+            f"{fmt(r['steps_run'])} / {fmt(r['steps_not_run'])} / {fmt(r['wh_saved'])} / {fmt(r['g_co2eq_saved'])}", src)
+    add("savings: early stopping", f"total ({len(e['runs'])} runs): steps not run / Wh saved / g CO2eq saved",
+        f"{fmt(e['total_steps_not_run'])} / {fmt(e['total_wh_saved'])} / {fmt(e['total_g_co2eq_saved'])}", src)
+    c = s["caching"]
+    for key, text in [("tif_decode", "decode + resize 1,200 train TIFs"), ("cache_load", "load train cache")]:
+        r = c[key]
+        add("savings: caching", f"{text} ({c['resolution']}): s / Wh / g CO2eq (short_run)",
+            f"{fmt(r['duration_s'])} / {fmt(r['energy_wh'])} / {fmt(r['g_co2eq'])} ({fmt(r['short_run'])})", src)
+    add("savings: caching", "own_cnn seed 42: steps run / batches per epoch / epochs / passes decoded",
+        f"{fmt(c['steps_run'])} / {fmt(c['batches_per_epoch'])} / {fmt(c['epochs'])} / {fmt(c['passes_decoded'])}", src)
+    add("savings: caching", "saving per training run if TIFs were decoded every epoch: Wh / g CO2eq / s",
+        f"{fmt(c['saving_per_training_run_wh'])} / {fmt(c['saving_per_training_run_g_co2eq'])} / {fmt(c['saving_per_training_run_s'])}", src)
+    b = c["build_cache_once"]
+    add("savings: caching", "building the cache once (all splits, both resolutions): Wh / g CO2eq / s",
+        f"{fmt(b['wh'])} / {fmt(b['g_co2eq'])} / {fmt(b['duration_s'])}", src)
+
+
 def main():
     config = {"task": "summary_table", "sets": "saved results only"}
     with tracked_run("analysis", "all_final", config, notes="results/summary.md") as run_dir:
@@ -225,6 +259,8 @@ def main():
         cost_rows(results, index)
         figure_rows()
         diagnostic_rows()
+        ablation_rows()  # New sections go last, so the row numbers above stay the same.
+        savings_rows()
 
         lines = [
             "# Numbers cited in the report",
