@@ -1,0 +1,13 @@
+label,family,kind,mae,x_train_kg,x_project_kg,mae_source,x_source
+mean,mean,test_seen MAE,25.85,8.95556e-05,0.00129171,results/results.csv (test_seen_mae),runs/index.csv (20261105-233219_baseline_mean_and_brightness_03b5; project = results.csv + all mean_and_brightness runs)
+brightness,brightness,test_seen MAE,1.14243,8.95556e-05,0.00130618,results/results.csv (test_seen_mae),runs/index.csv (20261105-233219_baseline_mean_and_brightness_03b5; project = results.csv + all mean_and_brightness runs)
+own_cnn,own_cnn,test_seen MAE,1.56924,0.000342981,0.00319061,results/results.csv (test_seen_mae),"results/results.csv (train_incl_search_kg_co2eq, project_kg_co2eq)"
+mobilenet,mobilenet_v3_small,test_seen MAE,1.24897,0.000692409,0.00373811,results/results.csv (test_seen_mae),"results/results.csv (train_incl_search_kg_co2eq, project_kg_co2eq)"
+resnet18,resnet18,test_seen MAE,1.95138,0.000864589,0.00418493,results/results.csv (test_seen_mae),"results/results.csv (train_incl_search_kg_co2eq, project_kg_co2eq)"
+own_cnn s43,own_cnn,val MAE,1.23368,0.000302345,0.000302345,runs/20261110-231341_train_own_cnn_be25/metrics.json (best_val_mae),runs/index.csv (20261110-231341_train_own_cnn_be25 + own_cnn search runs)
+own_cnn s44,own_cnn,val MAE,1.0272,0.000390289,0.000390289,runs/20261110-231422_train_own_cnn_1c4d/metrics.json (best_val_mae),runs/index.csv (20261110-231422_train_own_cnn_1c4d + own_cnn search runs)
+mobilenet s43,mobilenet_v3_small,val MAE,1.51366,0.000650508,0.000650508,runs/20261110-231701_train_mobilenet_v3_small_d8bb/metrics.json (best_val_mae),runs/index.csv (20261110-231701_train_mobilenet_v3_small_d8bb + mobilenet_v3_small search runs)
+mobilenet s44,mobilenet_v3_small,val MAE,1.34819,0.000655896,0.000655896,runs/20261110-231834_train_mobilenet_v3_small_88b5/metrics.json (best_val_mae),runs/index.csv (20261110-231834_train_mobilenet_v3_small_88b5 + mobilenet_v3_small search runs)
+own_cnn 256x192,own_cnn,val MAE,1.46151,0.000544597,0.000544597,runs/20261110-232222_train_own_cnn_a201/metrics.json (best_val_mae),runs/index.csv (20261110-232222_train_own_cnn_a201 + own_cnn search runs)
+own_cnn depthwise,own_cnn,val MAE,1.65066,0.00027389,0.00027389,runs/20261110-232352_train_own_cnn_ds_13c9/metrics.json (best_val_mae),runs/index.csv (20261110-232352_train_own_cnn_ds_13c9 + own_cnn search runs)
+resnet18 AMP,resnet18,val MAE,1.54254,0.000936788,0.000936788,runs/20261110-232429_train_resnet18_0845/metrics.json (best_val_mae),runs/index.csv (20261110-232429_train_resnet18_0845 + resnet18 search runs)

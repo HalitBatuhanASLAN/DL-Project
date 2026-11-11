@@ -1,0 +1,18 @@
+{
+  "pareto_front": {
+    "training": [
+      "brightness"
+    ],
+    "project": [
+      "mean",
+      "brightness"
+    ]
+  },
+  "status": "ok",
+  "error_type": null,
+  "error_message": null,
+  "duration_s": 3.0235595000012836,
+  "energy_kwh": 2.887459989043389e-05,
+  "emissions_kg": 1.3414734864697118e-05,
+  "short_run": true
+}

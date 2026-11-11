@@ -1,0 +1,8 @@
+model,seed,run_id,n_images,val_mae,mean_signed_residual,share_positive_residuals,counts_with_positive_mean_residual,n_counts,val_mae_after_removing_offset
+own_cnn,42,20261110-231256_train_own_cnn_73cc,400,1.35558,0.760792,0.7475,16,20,1.10756
+own_cnn,43,20261110-231341_train_own_cnn_be25,400,1.23368,-0.190168,0.5225,8,20,1.25011
+own_cnn,44,20261110-231422_train_own_cnn_1c4d,400,1.0272,-0.369459,0.39,6,20,1.00197
+mobilenet_v3_small,42,20261110-231518_train_mobilenet_v3_small_c673,400,1.51328,-0.195354,0.5175,11,20,1.52422
+mobilenet_v3_small,43,20261110-231701_train_mobilenet_v3_small_d8bb,400,1.51366,-0.222022,0.4375,9,20,1.49978
+mobilenet_v3_small,44,20261110-231834_train_mobilenet_v3_small_88b5,400,1.34819,-0.480765,0.4125,8,20,1.3391
+resnet18,42,20261110-232008_train_resnet18_c1c4,400,2.04668,0.285604,0.5775,12,20,2.0093
