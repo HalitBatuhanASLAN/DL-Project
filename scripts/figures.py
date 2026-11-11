@@ -85,12 +85,19 @@ VARIANTS = [
 
 
 # Main-figure label positions (offset in points, alignment) where the default label collides.
-LABEL_OFFSETS = {
-    "own_cnn depthwise": (-6, 3, "right"),
-    "own_cnn 256x192": (6, -10, "left"),
-    "mobilenet s43": (-6, 6, "right"),
+# Labels in the dense cluster go up into the empty space, on staggered rows, with a leader line.
+_COMMON_OFFSETS = {
+    "mean": (10, 3, "left"),
+    "brightness": (10, 3, "left"),
+    "own_cnn depthwise": (0, 22, "center"),
+    "own_cnn 256x192": (0, 35, "center"),
+    "mobilenet s43": (0, 55, "center"),
+    "mobilenet s44": (0, 75, "center"),
     "mobilenet": (6, -10, "left"),
-    "resnet18 AMP": (6, -10, "left"),
+}
+LABEL_OFFSETS = {
+    "training": {**_COMMON_OFFSETS, "resnet18 AMP": (6, -12, "left")},
+    "project": {**_COMMON_OFFSETS, "resnet18 AMP": (0, 35, "center")},
 }
 VARIANT_X_NOTE = ("x of a val-only variant = its own training run + its parent's LR search (the only runs "
                   "that belong to it), in both versions.\n"
@@ -167,7 +174,7 @@ def pareto_front(points):
     return pd.DataFrame(front)
 
 
-def plot_main(points, x_column, x_label, name):
+def plot_main(points, x_column, x_label, name, version):
     data = points.assign(x=points[x_column])
     test = data[data["kind"] == "test_seen MAE"]
     val = data[data["kind"] == "val MAE"]
@@ -190,9 +197,10 @@ def plot_main(points, x_column, x_label, name):
     # Direct labels; val points say "val" in the label as well, so they cannot be misread.
     for _, p in data.iterrows():
         text = p["label"] + (" (val)" if p["kind"] == "val MAE" else "")
-        dx, dy, ha = LABEL_OFFSETS.get(p["label"], (6, 3, "left"))
+        dx, dy, ha = LABEL_OFFSETS[version].get(p["label"], (6, 3, "left"))
+        leader = {"arrowstyle": "-", "color": "#c3c2b7", "linewidth": 0.6} if dy >= 20 else None
         ax.annotate(text, (p["x"], p["mae"]), xytext=(dx, dy), textcoords="offset points",
-                    fontsize=7, color="#3d3d3a", ha=ha)
+                    fontsize=7, color="#3d3d3a", ha=ha, arrowprops=leader)
 
     ax.set_xscale("log")
     ax.set_yscale("log")  # The mean baseline (25.85) is 15x the others; log keeps all readable.
@@ -316,9 +324,9 @@ def main():
         points.to_csv(FIG_DIR / "main_points.csv", index=False, lineterminator="\n", float_format="%.6g")
         fronts = {
             "training": plot_main(points, "x_train_kg", "kg CO2eq, training incl. LR search (log scale)",
-                                  "mae_vs_co2_training"),
+                                  "mae_vs_co2_training", "training"),
             "project": plot_main(points, "x_project_kg", "kg CO2eq, project total per model (log scale)",
-                                 "mae_vs_co2_project"),
+                                 "mae_vs_co2_project", "project"),
         }
         plot_val_curves(baseline_val)
         plot_blur(pd.read_csv(RESULTS_DIR / "test_mae_by_blur.csv"))
