@@ -1,0 +1,185 @@
+% CSE 655 Term Project - AI Usage Report (draft v0.1, 2026-11-11)
+% Source: ai_log/ai_journal_notes.md (entries A-U), ai_log/sessions/, chat links in Appendix.
+% Red TODO boxes = parts I (the student) must write or confirm myself.
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.1cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-\do\_}
+\setlist{itemsep=1pt,topsep=2pt}
+\newcommand{\kn}{KirazNet}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\setlength{\parskip}{3pt}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\title{\textbf{AI Usage Report}\\[2pt]\large CSE 655 Term Project --- Green CNNs for Image Regression}
+\author{Halit Batuhan Aslan \quad (220104004003)}
+\date{November 2026}
+
+\begin{document}
+\maketitle
+
+\noindent AI tools were used in every phase of this project. I worked with one rule: \emph{the AI proposes,
+I decide and verify}. Design choices were taken from options the AI listed, with my own written reasons;
+every number in the technical report is produced by a script from logged runs; every code session was
+saved (prompt, session log, transcript) in the repository under \texttt{ai\_log/}.
+
+% =====================================================================
+\section{Tools, versions and what they were used for}
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}p{3.6cm}p{3.6cm}Y@{}}
+\toprule
+Tool (version) & Interface & Used for\\
+\midrule
+Claude, Claude Opus 5.5 & claude.ai project chat (``project chat'') & understanding the spec, dataset choice,
+planning, writing all prompts for the coding agent, reviewing every result, drafting both reports\\
+Claude (version not shown in share) & claude.ai, Claude Desktop chat & second opinion on the dataset; data and
+training design discussions (options, thresholds, rule drafts)\\
+Claude, Claude Desktop code mode (Claude Opus 5.5 recorded from 2026-11-10) & agent running commands on my laptop &
+environment setup, all code, all runs, git commits and tags\\
+Gemini 3.6 Flash & gemini.google.com & second opinion on dataset choice\\
+ChatGPT (thinking mode, model not shown) & chatgpt.com & second opinion on dataset choice\\
+\bottomrule
+\end{tabularx}
+\end{center}
+To reduce cost, the more expensive Claude Fable 5.1 was reserved for the final consistency review of report,
+numbers and code \todo{confirm after the Fable review; remove this sentence if it was not used}.
+
+% =====================================================================
+\section{Log of important interactions}
+Dates are real; full prompts are in \texttt{ai\_log/prompts/} or in the linked chats (Appendix).
+\begin{center}\footnotesize
+\begin{tabularx}{\linewidth}{@{}p{1.25cm}p{1.6cm}YYY@{}}
+\toprule
+Date & Tool & What I asked & Short answer & Kept / changed / rejected, and why\\
+\midrule
+11-04 & Gemini, ChatGPT, Claude (3 chats) & ``Read the spec and suggest the easiest dataset for implementation, report
+and exam'' (same prompt) & Gemini, ChatGPT and one Claude chat: UTKFace (faces, age); the project chat: BBBC005 &
+Chose BBBC005: on faces, pretrained models have a large advantage, so the $1.15\times$ rule was risky.
+All three others switched after seeing the analysis --- Gemini without any new argument.\\
+11-04 & Claude (2nd chat) & Critique of my first plan & Pointed out \textbf{data leakage}: same scene at 16 blur
+levels and 2 stains & Kept: scene-grouped split. My main chat had missed this (Case 1).\\
+11-04/05 & Claude Desktop & Install CUDA PyTorch, env check with CodeCarbon & Driver supports CUDA $\le$12.4,
+newest torch only CUDA 13 & Chose torch 2.6.0+cu124 from its options; verified \texttt{cuda.is\_available()}.\\
+11-05 & Desktop code & Data inventory only, test ``one scene = 32 files'' & PASS; 600 scenes; added a pixel
+correlation check & Kept, including the extra check (names alone cannot prove ``same scene'').\\
+11-05 & Desktop chat & Data-prep options, deliberately without my own ideas & Found leakage itself; brightness
+shortcut; held-out counts; stain guess & Kept most; rejected stain guess and an $8\times$ costlier subset (Case 2).\\
+11-05 & Desktop chat & Numeric decision rules before running any check & Thresholds with reasons, git-tag freeze plan
+& Fixed 6 issues (committed path inside ignored folder, YAML without PyYAML, wrong script name, \ldots), then froze \texttt{rules-v1}.\\
+11-05 & Desktop code & Run the visual checks with the frozen rules & Stain = w1 (docs say w2); resolution check
+failed everywhere & Kept stain result; revised the resolution rule by one principle and disclosed it (Case 3).\\
+11-05 & Desktop chat & Training options (architecture, loss, budget, seeds, \ldots) & Design B (60{,}465 params),
+L1, AdamW, cosine, early stopping & Chose from options with my reasons; hand-checked the layer table; it corrected
+one of my reasons (Case 6).\\
+11-10 & Desktop code & LR search, final training, ablations, AMP & 17 runs; \kn{} best on val & Kept; asked for a
+post-hoc BatchNorm diagnostic, which disproved my own hypothesis.\\
+11-10 & Desktop code & Single test run per final model & \kn{} fails acceptance; brightness best & Did not re-test
+other seeds (``test once'' rule); analysed the failure on validation only.\\
+11-11 & project chat & Draft the technical report from \texttt{summary.md} & LaTeX draft & While drafting, found a
+wrong energy comparison (Case 5); I reviewed and edited the draft \todo{confirm}.\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+% =====================================================================
+\section{Cases where the AI was wrong, incomplete or misleading}
+The journal records 26 such cases; these six had the largest effect. None of them is invented: each is visible
+in the linked chats, session logs or git history.
+
+\textbf{Case 1 --- Missed data leakage (Claude, project chat).} The first recommendation of BBBC005 proposed
+selecting some blur levels but did not mention that the 19{,}200 files are only 600 scenes rendered 32 times.
+\emph{Detected} by asking a second Claude chat and ChatGPT, both of which raised it. \emph{Fixed} by a
+scene-grouped split, verified by four built-in checks (no scene in two splits, balanced cells). This is the
+same subject-exclusive split as in the gait paper I presented in class (Zhao et al.\ 2024). \emph{If missed:}
+the same layouts in train and test (pixel correlation 0.89), so an optimistic test error.
+
+\textbf{Case 2 --- Stain identity: a guess, then the documentation, both wrong in different ways.} A Claude
+Desktop chat first said ``w1 is very likely the nuclei'' from the mean brightness of five images. I pointed to the
+official page (``2 = nuclei''), and it switched to w2. Our own frozen pixel test then showed that the w1 object
+lies fully inside the w2 object and is 3--4$\times$ smaller: w1 \emph{is} the nuclei channel. \emph{Lesson:}
+neither a weak heuristic nor the documentation replaced a direct measurement; the conflict is reported.
+
+\textbf{Case 3 --- A decision rule that measured the wrong thing (rule proposed by AI, approved by me).} The
+resolution check found ``peaks'' with 1\,px smoothing, while a nucleus is 31.7\,px wide. It counted texture
+inside nuclei (154--185 peaks in images with 100 nuclei) and rejected every resolution, which would have forced
+$348\times260$, about 7.4 times the pixels per step. \emph{Detected} by the coding agent's diagnostic plot, which it
+showed me instead of changing the rule silently. \emph{Fixed} by one principle (peaks at nucleus scale), with all
+thresholds unchanged; the revision is tagged and disclosed as not pre-registered. Two of the three changes I wrote
+had no effect (they rounded to the old values), which the agent also pointed out.
+
+\textbf{Case 4 --- Gemini suggested inventing ``AI errors'' for this report.} It listed three ready-made examples
+(e.g.\ ``the AI forgot the stride in the receptive field''). None of them happened. \emph{Rejected:} writing them
+would be fabrication. In the same answer, it claimed that an own-CNN MAE of 6--7 would ``pass without hesitation'',
+then itself computed the limit as $1.15\times4.5=5.17$. \emph{Detected} by doing the arithmetic.
+
+\textbf{Case 5 --- A misleading energy comparison (Claude, project chat).} We first reported that $256\times192$
+needs ``4$\times$ the MACs but only 2$\times$ the energy'' and the depthwise variant ``0.66$\times$ the energy''.
+These compared \emph{whole runs} that early stopping had ended at different steps. \emph{Detected} while drafting
+the report, by recomputing energy per step: $2.98\times$ and $0.90\times$. \emph{Fixed} in the report and in
+\texttt{summary.md}; the corrected numbers make the ``MACs do not predict energy'' point stronger.
+
+\textbf{Case 6 --- Smaller but real coding-agent errors.} (a) A BatchNorm diagnostic fed scene-sorted batches
+and produced absurd errors (120 cells); the agent noticed the implausible result, fixed the shuffle and re-ran;
+both runs stay in the index. (b) Twice an edit command silently changed nothing; caught by \texttt{git status}.
+(c) A first install command from the project chat gave a CPU-only PyTorch; caught from the wheel size and
+\texttt{cuda.is\_available()=False} --- otherwise every ``GPU'' energy number would have been a CPU number.
+(d) While searching my computer for transcripts, the agent read file names from unrelated projects; it noticed
+this itself before committing, and I decided to publish only masked transcripts and made the repository private.
+
+% =====================================================================
+\section{How I verified AI-generated code and claims}
+\begin{itemize}
+\item \textbf{Hand calculations.} Every layer of \kn{} (output shape, parameters, receptive field, MACs) by the
+course formulas; the analytic mean-baseline MAE ($517/20=25.85$); the acceptance limit ($1.15\times1.249=1.436$).
+\item \textbf{Built-in checks in every script:} split (4 checks), cache (41 checks), layer table (25 checks:
+hand formula $=$ \texttt{sum(p.numel())} $=$ \texttt{FlopCounterMode}), init check (every model starts at MAE 25.85),
+reproducibility (two runs bit-identical), pre-test checks (shuffling, artifact hashes, no earlier test use).
+\item \textbf{Comparison with documentation and with the data.} Dataset page vs.\ pixel test (Case 2); PyTorch
+install selector vs.\ driver limits; course slides for the receptive-field formula.
+\item \textbf{Cross-checking between models.} The same question to Gemini, ChatGPT and two Claude chats (Case 1).
+\item \textbf{Freezing before looking.} Rules were committed and tagged before the runs they govern, scripts were
+committed before they ran, and the test script refuses a second run per model. This makes it impossible for me
+or the AI to tune on the test set without leaving a trace.
+\item \textbf{Plausibility checks.} Absurd numbers (Case 6a), impossible counts (``C50'' is not a count level),
+arithmetic that did not add up (Cases 4 and 5) and step counts were questioned before anything was accepted.
+\end{itemize}
+
+% =====================================================================
+\section{Reflection}
+\todo{Write this section yourself (about half a page). Questions to answer:
+(1) What did the tools make faster? (e.g.\ code and scripts in minutes; rule drafts; LaTeX)
+(2) What did they make harder? (e.g.\ checking every claim; confident but wrong answers; agents that act outside the
+project folder; keeping up with many sessions)
+(3) Which case taught you the most, and why?
+(4) What would you do differently next time? (e.g.\ write the selection rule as ``median of the last
+evaluations'' instead of ``best''; give agents an explicit folder scope from the start; compute what a formula
+gives before freezing it)
+(5) How do you know you understand the submitted work, not only the AI? (hand-computed layer table, reasons in
+your own words, exam practice).}
+
+% =====================================================================
+\appendix
+\section{Chat links and exports}
+\begin{itemize}\small
+\item Gemini (dataset): \url{https://share.gemini.google/luuknxEZ0bfa}
+\item ChatGPT (dataset): \url{https://chatgpt.com/share/6aecb395-27c0-83eb-926f-bf6d4b88a8d7}
+\item Claude, second chat (dataset): \url{https://claude.ai/share/41fdf8fa-e2a5-4a5f-a6b7-985901012a1c}
+\item Claude, project chat (planning, review, reports): \url{https://claude.ai/share/3359d3d5-a588-4b07-8095-e9bca530f365}
+\todo{refresh this link at the end so it covers the whole conversation}
+\item Claude Desktop chat, environment setup: \url{https://claude.ai/share/ed976c28-c7a3-4430-a328-8938fb31b840}
+\item Claude Desktop chat, data and training design:\\ \url{https://claude.ai/share/528d3889-9f95-4485-8f2d-b6b1f3f13ed2}
+\item Claude Desktop code sessions (no share links in code mode): every prompt
+(\texttt{ai\_log/prompts/}), the agent's session log (\texttt{ai\_log/sessions/}) and the transcript
+(\texttt{ai\_log/transcripts/}, masked for unrelated personal data) are in the submitted repository.
+\todo{regenerate transcripts at the end so every session is complete; export the share links as PDF too}
+\end{itemize}
+The full working journal with all 26 cases is \texttt{ai\_log/ai\_journal\_notes.md}.
+
+\end{document}
